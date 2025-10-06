@@ -2,31 +2,42 @@ import  {  useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTwitterSquare, faTumblrSquare, faGooglePlusSquare, faGithubSquare } from '@fortawesome/free-brands-svg-icons';
 import { useNavigate } from 'react-router-dom';
-
+import axios from 'axios'
 import '../styles/global.css'
+
 
 const Login = () => {
     const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [password_hash, setPassword] = useState('');
 
-    const handleLogin = (event) => {
-        event.preventDefault();
-        
-        // Simple validation (replace with actual authentication)
-        if (username && password) {
-            alert(`Welcome, ${username}! Login successful.`);
-            // Here you would typically send the credentials to your server
-            console.log('Login attempt:', { username, password: '***' });
-        } else {
-            alert('Please fill in all fields.');
-        }
-    };
+
+const handleLogin =(e)=> {
+        e.preventDefault(); // Prevent page reload
+            axios.post("http://localhost:3001/login", { username, password_hash })
+        .then(response => {
+            
+           // console.log(response.data);
+                if (response.status===200){
+                        navigate('/editor')
+                }
+        })
+        .catch(error => {
+            console.error("Login failed:");
+        });
+}
+
+
+
+
+
 
     const handleSocialLogin = (platform) => {
         console.log(`Social login with ${platform}`);
-        // Here you would implement actual social login logic
         alert(`Social login with ${platform} (functionality not implemented)`);
     };
+
+
+
 const navigate=useNavigate()
 const handleHome =()=>{
 navigate('/')
@@ -166,7 +177,7 @@ navigate('/')
                                 <div className="code-line">function authenticateUser() {`{`}</div>
                             
                                         <div className="login-header">
-                                            <h1 className="login-title">Sign In</h1>
+                                            <h1 className="login-title">Log In</h1>
                                             <p className="login-subtitle">Enter your credentials to continue</p>
                                         </div>
 
@@ -178,7 +189,8 @@ navigate('/')
                                                 className="form-input" 
                                                 placeholder="Enter your username" 
                                                 value={username}
-                                                onChange={(e) => setUsername(e.target.value)}
+                                                onChange={(e) => {setUsername(e.target.value)}
+                                                }
                                                 required 
                                             />
                                         </div>
@@ -191,13 +203,13 @@ navigate('/')
                                         type="password" 
                                         className="form-input" 
                                         placeholder="Enter your password" 
-                                        value={password}
+                                        value={password_hash}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required 
                                     />
                                 </div>
 
-                                <button type="submit" className="login-button">Sign In</button>
+                                <button type="submit" className="login-button">Log In</button>
                             </form>
 
                             <div className="login-footer">

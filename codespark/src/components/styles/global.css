@@ -28,7 +28,6 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
   align-items: center;
 }
 
-
 .logo {
   display: flex;
   align-items: center;
@@ -352,9 +351,7 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
   border-radius: 0.25rem;
 }
 
-.file-icon {
-  background-color: #0d9488; /* teal */
-}
+
 
 .users-icon {
   background-color: #2563eb; /* blue */
