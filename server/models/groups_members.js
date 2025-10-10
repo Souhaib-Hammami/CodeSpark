@@ -3,19 +3,27 @@
 const groups_members = (connection, DataTypes) => {
   const GroupsMembers = connection.define(
     "groups_members", {
+      id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
     
       onDelete: 'CASCADE'
     },
     group_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
+      // primaryKey: true,
       onDelete: 'CASCADE'
     },
+    group_name: {
+  type: DataTypes.STRING,
+  allowNull: false
+},
     role: {
       type: DataTypes.ENUM('owner', 'admin', 'editor', 'viewer'),
       allowNull: false,

@@ -12,15 +12,37 @@ const cors=require('cors')
 app.use(cors())
 
 
+const allGroupsE=require('./routes/editor')
+app.use("/",allGroupsE)
+
+const getFiles4Editor=require('./routes/getFiles4Editor')
+app.use("/",getFiles4Editor)
+
+
+const allGroups=require('./routes/groups')
+app.use("/",allGroups)
+
+const createGroup=require('./routes/groups')
+app.use("/",createGroup)
+
+const newfile=require('./routes/newfile')
+app.use("/",newfile)
+
+
 
 const loginRouter=require('./routes/users')
 app.use("/",loginRouter);
+
+
+
+
 
 const TestConection =require('./postgresql/TestConection')
 TestConection()
 
 
 const { pgconnection, users, groups, files, groups_members } = require('./models/index');
+const createGroups = require('./controllers/createGroup');
 
 // sequelize.sync()	Synchronizes models to DB: creates tables if missing
 // force: true	Drops and recreates all tables

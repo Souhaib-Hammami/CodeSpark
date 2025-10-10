@@ -1,4 +1,9 @@
 const { users } = require('../models');
+const jwt=require('jsonwebtoken')
+
+
+
+
 
 const login = async (req, res) => {
   const username = req.body.username;
@@ -7,7 +12,6 @@ const login = async (req, res) => {
   console.log("password : "+ password )
 
   try {
-  
     const user = await users.findOne({ where: { username: username } });
         
         if (user === null) {
@@ -25,8 +29,8 @@ const login = async (req, res) => {
         //return res.json({ message: "Incorrect password" });
         }
         
-        
-        return res.status(200).json({message: "Login successful",user}); 
+        const token=jwt.sign({id:user.id},process.env.JWT_SECRET,{expiresIn:"1h"})
+        return res.status(200).json({message: "Login successful",user,token}); 
     
    
 

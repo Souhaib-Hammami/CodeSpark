@@ -9,18 +9,21 @@ import '../styles/global.css'
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password_hash, setPassword] = useState('');
+    const [token, setToken] = useState(localStorage.getItem("token") || null);
 
 
 const handleLogin =(e)=> {
         e.preventDefault(); // Prevent page reload
             axios.post("http://localhost:3001/login", { username, password_hash })
         .then(response => {
-            
+        const { token } = response.data;
+        localStorage.setItem("token", token);
+        setToken(token);
            // console.log(response.data);
                 if (response.status===200){
                         navigate('/editor')
                 }
-        })
+            })
         .catch(error => {
             console.error("Login failed:");
         });

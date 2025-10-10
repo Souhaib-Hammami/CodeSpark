@@ -1,24 +1,142 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect,useState } from 'react';
 import Editor from '@monaco-editor/react';
-
+import axios from 'axios'
+import { jwtDecode } from 'jwt-decode'; 
 
 
 const EditorPage =()=>{
+  const [groupsList, setGroupsList] = useState([]);
+  const token = localStorage.getItem("token");
+const [DataListFiles, setDataListFiles] = useState([]);
+
+  useEffect(() => {
+    if (!token) {
+      console.error("No token found in localStorage");
+      return;
+    }
+const fetch =()=>{
+
+    axios
+      .get("http://localhost:3001/groups", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setGroupsList(res.data.ownedGroups || []);
+      })
+      .catch((err) => console.error("Error fetching groups:", err));
+  }
+     fetch()
+
+handleGetFiles()
+
+  }, [token]);
+
+
+
+
+// console.log(groupsList.map(group => group.name));
+const handleCreateFile = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      console.error('No token found');
+      alert('Please login first');
+      return;
+    }
+
+    
+    const decoded = jwtDecode(token);
+        console.log('Decoded token:', decoded); 
+
+    const userId = decoded.id; 
+console.log(userId)
+    const response = await axios.post(
+      'http://localhost:3001/newfile',
+
+
+     { user_id: userId ,filename:"renameMe.js",content :"code me please !"},
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    console.log('Folder created successfully:', response.data.message);
+    alert(response.data.message);
+    
+  } catch (error) {
+    console.error('Error creating folder:', error);
+    alert(error.response?.data?.error || 'Failed to create folder');
+  }
+  handleGetFiles()
+};
+
+
+
+
+const handleGetFiles = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      console.error('No token found');
+      alert('Please login first');
+      return;
+    }
+
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
+
+    const response = await axios.post(
+      'http://localhost:3001/getFiles4Editor',
+      { userId: userId },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    //  console.log('Files:', response.data);
+
+   return setDataListFiles(response.data)
+   
+
+  } catch (error) {
+    console.error('Error loading files:', error);
+    alert(error.response?.data?.error || 'Failed to load files');
+  }
+};
+
+
+
+   
+
+
+
 
 
 const navigate =useNavigate()
-
-
 const Go2Home =()=>{
 navigate('/')
 }
 
-const Go2Profil=()=>{
+const Go2Profil=()=>{    
     navigate('/profil')
 }
 
+
+// const owner_id = JSON.parse(localStorage.getItem("token"));
+// navigate(`/groups/${owner_id}`);
+
+
 const Go2Groups=()=>{
-    navigate('/groups')
+   
+    navigate(`/groups`)
+
 }
  
 
@@ -102,21 +220,57 @@ return (
              <div className="-EDR-file-sidebar">
                 <div className="-EDR-sidebar-header">
                     <div className="-EDR-sidebar-title">Explorer</div>
-                    <button className="-EDR-new-file-btn">+ New File</button>
+                    
+                    <button onClick={handleCreateFile} className="-EDR-new-file-btn">+ New File</button>
                 </div>
                 <div className="-EDR-file-list">
+                 <div >
+              
+
+            {DataListFiles.length === 0 ? (
+                <div style={{ color: '#ccc', padding: '10px' }}>No files found</div>
+              ) : (
+                DataListFiles.map((filename, index) => (
+                  <div key={index} className="-EDR-file-item">
+                    <div className="-EDR-file-icon -EDR-js">J</div>
+                    <span>{filename}</span>
+                  </div>
+                ))
+              )}
+
+
+
+
+                 </div>
+
                     <div className="-EDR-file-item -EDR-active">
-                        <div className="-EDR-file-icon -EDR-html">H</div>
+                        <div className="-EDR-file-icon ">H</div>
                         <span>index.html</span>
                     </div>
                     <div className="-EDR-file-item">
                         <div className="-EDR-file-icon -EDR-css">C</div>
                         <span>style.css</span>
                     </div>
-                    <div className="-EDR-file-item">
-                        <div className="-EDR-file-icon -EDR-js">J</div>
-                        <span>script.js</span>
+
+
+                    <div style={{
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '16px',
+                    padding: '1.5rem',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+                    color: 'white',
+                    backgroundColor:'rgba(221, 238, 248, 1)'
+                    }}>
+
+
+
+                    <button className="-EDR-your-groups-btn">Your groups</button>
+                    <ul>
+                    {groupsList.map(group => 
+                    <button key={group.id} className='-EDR-groups-list-btn'>{group.name} </button>)} 
+                    </ul>
                     </div>
+                    
 
 
 
@@ -138,6 +292,10 @@ return (
                         <span className="-EDR-tab-name">script.js</span>
                         <span className="-EDR-tab-close">×</span>
                     </div>
+
+                
+
+
                 </div>
 
                 <div className="-EDR-editor-toolbar">
