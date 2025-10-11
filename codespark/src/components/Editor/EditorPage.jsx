@@ -3,12 +3,13 @@ import { useEffect,useState } from 'react';
 import Editor from '@monaco-editor/react';
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'; 
-
+import IconGenerator from '../IconGenerator/IconGenerator'
 
 const EditorPage =()=>{
   const [groupsList, setGroupsList] = useState([]);
   const token = localStorage.getItem("token");
 const [DataListFiles, setDataListFiles] = useState([]);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     if (!token) {
@@ -112,7 +113,10 @@ const handleGetFiles = async () => {
 };
 
 
+const HideWelcome=()=>{
+setIsVisible(false);
 
+}
    
 
 
@@ -223,8 +227,8 @@ return (
                     
                     <button onClick={handleCreateFile} className="-EDR-new-file-btn">+ New File</button>
                 </div>
-                <div className="-EDR-file-list">
-                 <div >
+      <div className="-EDR-file-list">
+               
               
 
             {DataListFiles.length === 0 ? (
@@ -232,25 +236,36 @@ return (
               ) : (
                 DataListFiles.map((filename, index) => (
                   <div key={index} className="-EDR-file-item">
-                    <div className="-EDR-file-icon -EDR-js">J</div>
-                    <span>{filename}</span>
-                  </div>
+
+            
+               
+                 <IconGenerator   
+                  color="#18db52ff"
+                   extension="js"
+                   
+                     />
+                    <input
+                    className='InputLikeNameFile'
+                    value={filename}
+                    > 
+                    </input>
+                   
+                   
+                  
+
+              </div>
+
+
+                   
+                 
                 ))
               )}
 
 
 
 
-                 </div>
+             
 
-                    <div className="-EDR-file-item -EDR-active">
-                        <div className="-EDR-file-icon ">H</div>
-                        <span>index.html</span>
-                    </div>
-                    <div className="-EDR-file-item">
-                        <div className="-EDR-file-icon -EDR-css">C</div>
-                        <span>style.css</span>
-                    </div>
 
 
                     <div style={{
@@ -322,8 +337,9 @@ return (
                     </div>
                 </div>
 
-                <div className="-EDR-code-editor">
+                <div onClick={HideWelcome} className="-EDR-code-editor">
                     <Editor 
+                    
                     height="90vh" 
                     defaultLanguage="javascript"
                      defaultValue="// some comment" 
@@ -334,13 +350,16 @@ return (
                      />;
                 </div>
 
-              <div className="-EDR-welcome-screen">
+
+ {isVisible && (
+              <div  className="-EDR-welcome-screen">
                     <div className="-EDR-welcome-icon">
 <img src="./logo.png" alt="no logo"  />
                     </div>
                     <h2 className="-EDR-welcome-title">Welcome to Code Spark</h2>
                     <p className="-EDR-welcome-text">Create a new file or select an existing one to start coding</p>
                 </div>
+                )}
                 </div>
  </div> </div> 
 )

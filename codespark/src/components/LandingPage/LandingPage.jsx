@@ -1,8 +1,6 @@
 import { Code2, Users, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
 import '../styles/global.css'
-
 
 
 
@@ -48,6 +46,9 @@ navigate('/login')
             Code Together, Create Better
           </h1>
           <p className="hero-subtitle">
+            
+
+
             A powerful online code editor with real-time collaboration, file management, and group sharing capabilities.
           </p>
           <button className="btn btn-primary btn-lg btnimg" 
