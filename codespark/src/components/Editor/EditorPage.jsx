@@ -10,6 +10,11 @@ const EditorPage =()=>{
   const token = localStorage.getItem("token");
 const [DataListFiles, setDataListFiles] = useState([]);
   const [isVisible, setIsVisible] = useState(true);
+  const [selectedFilename, setSelectedFilename] = useState('');
+  const [fileCount, setFileCount] = useState(0); // Track number of created files
+  const [NextRenameMEFileName, setNextRenameMEFileName] = useState('');
+
+  const [fn, setFn] = useState('renameMe.js'); 
 
   useEffect(() => {
     if (!token) {
@@ -52,12 +57,29 @@ const handleCreateFile = async () => {
         console.log('Decoded token:', decoded); 
 
     const userId = decoded.id; 
+
 console.log(userId)
+     
+
+    let newFileName = 'renameMe.js';
+    if (fileCount > 0) {
+      newFileName = `renameMe(${fileCount}).js`;
+    }
+
+    // Update the state filename and file count
+    setFn(newFileName);
+    setFileCount(prev => prev + 1);
+
+
+
     const response = await axios.post(
       'http://localhost:3001/newfile',
+     
 
-
-     { user_id: userId ,filename:"renameMe.js",content :"code me please !"},
+     { user_id: userId ,
+      filename:newFileName,
+      content :"code me please !"
+    },
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -103,6 +125,45 @@ const handleGetFiles = async () => {
 
     //  console.log('Files:', response.data);
 
+const files = response.data; // Should be array of filenames
+
+    // Regex to match: renameME.js or renameME(n).js
+    const renameMeRegex = /^renameMe(?:\((\d+)\))?\.js$/;
+
+    let maxIndex = -1;
+
+    files.forEach(filename => {
+      const match = filename.match(renameMeRegex);
+      if (match) {
+        // If no number (i.e., renameME.js), treat as index 0
+        const index = match[1] ? parseInt(match[1], 10) : 0;
+        if (index > maxIndex) {
+          maxIndex = index;
+        }
+      }
+    });
+
+    // Now determine the next filename
+    let nextFileName;
+    if (maxIndex === -1) {
+      // No file at all
+      nextFileName = 'renameMe.js';
+    } else if (maxIndex === 0 && files.includes('renameMe.js')) {
+      // Only renameME.js exists
+      nextFileName = 'renameMe(1).js';
+    } else {
+      nextFileName = `renameMe(${maxIndex + 1}).js`;
+    }
+
+    console.log(`✅ Next renameMe file should be: ${nextFileName}`);
+
+    // Store for UI or creation
+    setDataListFiles(files);
+    setNextRenameMEFileName(nextFileName);
+
+
+
+
    return setDataListFiles(response.data)
    
 
@@ -113,12 +174,15 @@ const handleGetFiles = async () => {
 };
 
 
+
+console.log("how ell s7I7",NextRenameMEFileName)
+
+
 const HideWelcome=()=>{
 setIsVisible(false);
 
 }
    
-
 
 
 
@@ -235,24 +299,22 @@ return (
                 <div style={{ color: '#ccc', padding: '10px' }}>No files found</div>
               ) : (
                 DataListFiles.map((filename, index) => (
-                  <div key={index} className="-EDR-file-item">
 
-            
-               
-                 <IconGenerator   
-                  color="#18db52ff"
-                   extension="js"
-                   
-                     />
-                    <input
-                    className='InputLikeNameFile'
-                    value={filename}
-                    > 
-                    </input>
-                   
-                   
-                  
 
+                  <div
+                  onClick= {() => setSelectedFilename(filename)}
+                   key={index} 
+                   className="-EDR-file-item">
+                        <IconGenerator   
+                          filename={filename}
+                            />
+                            <input
+
+                            className='InputLikeNameFile'
+                            value={filename}
+                            > 
+                            </input>
+                                      
               </div>
 
 
@@ -314,7 +376,7 @@ return (
                 </div>
 
                 <div className="-EDR-editor-toolbar">
-                    <span className="-EDR-toolbar-filename">index.html</span>
+                    <span className="-EDR-toolbar-filename">{selectedFilename}</span>
                     <div className="-EDR-toolbar-actions">
                         <button className="-EDR-toolbar-btn">
                             <svg className="-EDR-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

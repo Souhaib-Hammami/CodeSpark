@@ -273,6 +273,10 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
   }
 }
 
+
+
+
+
 .benefits-subtitle {
   font-size: 1.125rem;
   color: #4b5563; /* gray-600 */
@@ -293,12 +297,18 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
 }
 
 .benefit-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  background-color: #0d9488; /* teal-600 */
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-top: 0.25rem;
+        display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      background-color: #4CAF50; /* Green */
+      color: rgb(255, 255, 255);
+      border-radius: 50%; /* Makes it circular */
+      font-size: 24px;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+
 }
 
 .benefit-text .benefit-title {
@@ -1024,7 +1034,7 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
         }
 
 [class$='-icon']::before {
-  font-size: 25px !important;
+  font-size: 35px !important;
 }
 .InputLikeNameFile{
    outline: none;
@@ -1037,31 +1047,7 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
 background-color: #f3f4f6;
 }
 
-        /* .-EDR-file-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .-EDR-file-icon.-EDR-html {
-            background: linear-gradient(135deg, #e34c26, #f06529);
-        }
-
-        .-EDR-file-icon.-EDR-css {
-            background: linear-gradient(135deg, #264de4, #2965f1);
-        }
-
-        .-EDR-file-icon.-EDR-js {
-            background: linear-gradient(135deg, #f7df1e, #f0db4f);
-            color: #323330;
-        } */
+   
 
 /*///* eli zetha group list*/
 .-EDR-groups-list-btn {

@@ -116,15 +116,15 @@ navigate('/login')
         <ul className="benefits-list">
        
           <li className="benefit-item">
-            <span className="benefit-icon check-icon"></span>
+            <span className="benefit-icon ">&#10003;</span>
             <div className="benefit-text">
-              <span className="benefit-title">Real-time Sync</span>
+              <span className="benefit-title"> Real-time Sync</span>
               <p className="benefit-description">Collaborate instantly without losing changes.</p>
             </div>
           </li>
 
           <li className="benefit-item">
-            <span className="benefit-icon check-icon"></span>
+            <span className="benefit-icon ">&#10003;</span>
             <div className="benefit-text">
               <span className="benefit-title">Secure Workspaces</span>
               <p className="benefit-description">Work securely with encryption and access control.</p>
@@ -132,7 +132,7 @@ navigate('/login')
           </li>
 
           <li className="benefit-item">
-            <span className="benefit-icon check-icon"></span>
+            <span className="benefit-icon">&#10003;</span>
             <div className="benefit-text">
               <span className="benefit-title">Developer Tools</span>
               <p className="benefit-description">Integrated debugging and version control.</p>
