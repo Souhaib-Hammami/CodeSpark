@@ -12,9 +12,38 @@ const Groups = () => {
   const [showModal, setShowModal] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [groupDesc, setGroupDesc] = useState("");
-  const navigate = useNavigate();
+  const [groupsSearch, setGroupsSearch] = useState([]);
 
-  const token = localStorage.getItem("token");
+
+const handleClick = (groupId) => {
+  setGroupsSearch(prev => 
+    prev.map(group => {
+      if (group.id === groupId && group.joinState !== "joined") {
+        
+        setTimeout(() => {
+          setGroupsSearch(innerPrev => 
+            innerPrev.map(g => 
+              g.id === groupId ? { ...g, joinState: "joined" } : g
+            )
+          );
+        }, 700);
+        
+        return { ...group, joinState: "waiting" };
+      }
+      return group;
+    })
+  );
+};
+
+
+
+
+  const navigate = useNavigate();
+const [input,setinput]=useState('')
+ const [token, setToken] = useState(localStorage.getItem("token"));
+
+
+
 
   useEffect(() => {
     if (!token) {
@@ -22,15 +51,12 @@ const Groups = () => {
       return;
     }
 
-fetch()
+      const fetch =()=>{
 
-  }, [token]);
-
-
-  const fetch =()=>{
 
     axios
-      .get("http://localhost:3001/groups", {
+      .get("http://localhost:3001/groups",{
+       
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -42,7 +68,42 @@ fetch()
   }
 
 
-  const Go2Editor = () => navigate("/editor");
+fetch()
+
+  }, [token]);
+
+
+
+
+
+const handerinput=async (e) => {
+const query=e.target.value
+setinput(query)
+
+ if (!query.trim()) {
+    setGroupsSearch([]); // fasa5 les results if input fere8
+    return;
+  }
+
+try {
+ const result= await axios.get(`http://localhost:3001/searchGroup`,
+    {
+    params: { query }
+  }
+    ,
+    {
+    headers:{Authorization:`Bearer ${token}`}
+  }
+)
+setGroupsSearch(result.data.data)
+console.log(result)
+} catch (error) {
+  console.log(error)
+}
+
+}
+
+
 
  const handleCreateGroup = async (e) => {
   e.preventDefault();
@@ -54,7 +115,6 @@ fetch()
       return;
     }
 
-    // ✅ Decode the token to get the user ID
     const decoded = jwtDecode(token);
     const owner_id = decoded?.id || decoded?.user_id; // depends on your token payload
 
@@ -78,10 +138,19 @@ fetch()
     await axios.post("http://localhost:3001/groups", newGroup, {
       headers: { Authorization: `Bearer ${token}` },
     });
+   
+    
+    const res = await axios.get("http://localhost:3001/groups", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    
+    setGroupsList(res.data.ownedGroups || []);
 
     // Handle success
-    fetch(); // refresh group list or similar
     setShowModal(false);
+        setGroupName("");
+    setGroupDesc("");
 
   } catch (err) {
     console.error("Error creating group:", err);
@@ -154,27 +223,98 @@ const formatDate = (isoString) => {
 
 const imageOptions = ['blue_grp.png', 'orange_grp.png', 'green_grp.png','purpul_grp.png'];
 
+  const Go2Editor = () => navigate("/editor");
 
  
 
   return (
     
-    <div className="GrpScreen">
+    
+    <div className="GrpScreen">   
       <div className="GrpContainer">
+
+
+ <div className="-EDR-top-nav">
+            <div className="-EDR-nav-left">
+          <div 
+          className="logo"
+        //  onClick={Go2Home}
+          >
+            <img className='logo-icon' src="./logo.png" alt="no logo" /> 
+            <span className="logo-text">Code Spark</span>
+          </div>
+            </div>
+            <div className="-EDR-nav-right">
+                <button 
+                
+                 onClick={Go2Editor}
+                className="-EDR-nav-btn">
+                    <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>Editor</span>
+
+                </button>
+                <button 
+                // onClick={Go2Profil}
+                className="-EDR-nav-btn"
+                >
+                    <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6"></path>
+                        <path d="M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24"></path>
+                        <path d="M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+                    </svg>
+                    <span>Profile</span>
+                </button>
+                <button className="-EDR-nav-btn">
+                    <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span 
+                    // onClick={logout}
+                    >Logout</span>
+                </button>
+            </div>
+        </div>
+
+        </div>
+
+
+<div className="GrpContainerg">
         <div className="GrpHeader">
           <div className="GrpHeaderLeft">
-            <img
-              onClick={Go2Editor}
-              className="back2editor"
-              src="back2editor.png"
-              alt="Back to Editor"
-            />
-            <div>
-              <h1 className="GrpTitle">Groups</h1>
-              <p className="GrpSubtitle">Collaborate with your team</p>
-            </div>
-          </div>
 
+            <div>
+              <h1 className="GrpTitle">Groups Management</h1> 
+              <p className="GrpSubtitle">Collaborate with your team</p>
+            </div>              
+
+
+ 
+          </div>
+<input
+className="searchGrp"
+placeholder="Search For other Groups..."
+type="text"
+  value={input} 
+
+onChange={handerinput}
+
+  onFocus={(e) => {
+    e.target.style.borderColor = '#4A90E2';
+    e.target.style.boxShadow = '0 0 0 3px rgba(74, 144, 226, 0.3)';
+  }}
+  onBlur={(e) => {
+    e.target.style.borderColor = '#ccc';
+    e.target.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.05)';
+  }}
+/>
           <div className="GrpCreateBtnWrapper">
             <button
               className="GrpCreateBtn"
@@ -185,6 +325,68 @@ const imageOptions = ['blue_grp.png', 'orange_grp.png', 'green_grp.png','purpul_
             </button>
           </div>
         </div>
+         {groupsSearch.length > 0 && (
+      <div className="groups-list">
+        <div className="partsgrp">Your search results</div>   
+        {groupsSearch.map((group) => 
+        { 
+          const randomImage = imageOptions[Math.floor(Math.random() * imageOptions.length)];
+const currentState = group.joinState || "join"; 
+           return (
+
+<div key={group.id} className="GrpCard">
+  
+  
+                  <div className="GrpCardHeader">
+
+                    <img 
+                    src={randomImage} 
+                    alt="Group icon" 
+                    width="50"   
+                    style={{
+                        border: "2px solid #ccc",
+                        borderRadius: "70%",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.3)"
+                      }}/>
+                    <div className="GrpCardHeaderText">
+                      
+                            <h3 className="GrpCardTitle">{group.name}</h3>
+
+
+            
+                      <p className="GrpMutedText">{group.description}</p>
+                    </div>
+
+                               <button
+                                  id="join-btnActivation"
+                                  onClick={()=>handleClick(group.id)}
+                                className={`join-btn join-btn--${currentState}`} 
+
+                                >
+                                  <span className="join-btn__icon"></span>
+                                  <span className="join-btn__text">
+                                    {currentState === "joined"  ? "joined"
+                                      : currentState === "waiting" ? "Please wait..."
+                                      : "Join"}
+                                  </span>
+                                </button>
+
+
+
+                  </div>
+
+                </div>
+           )
+}
+
+        
+        
+        
+        )}
+      </div>
+    )}
+        <div className="partsgrp">Your Groups</div>
+
 
                {groupsList.length === 0 ? (
           <p>No groups found or still loading...</p>
@@ -196,7 +398,9 @@ const imageOptions = ['blue_grp.png', 'orange_grp.png', 'green_grp.png','purpul_
 
               return (
                 <div key={group.id} className="GrpCard">
+
                   <div className="GrpCardHeader">
+                    
                     <img 
                     src={randomImage} 
                     alt="Group icon" 
@@ -206,7 +410,9 @@ const imageOptions = ['blue_grp.png', 'orange_grp.png', 'green_grp.png','purpul_
                         borderRadius: "70%",
                         boxShadow: "0 2px 6px rgba(0, 0, 0, 0.3)"
                       }}/>
+                      
                     <div className="GrpCardHeaderText">
+                      
                       <h3 className="GrpCardTitle">{group.name}</h3>
                       <p className="GrpMutedText">{group.description}</p>
                     </div>
@@ -240,8 +446,19 @@ const imageOptions = ['blue_grp.png', 'orange_grp.png', 'green_grp.png','purpul_
               );
             })}
           </div>
-        )}
-        {/* 🎯 Modal */}
+        )
+        }
+
+       
+
+        {/* {groupsList.length === 0 ? (
+          <p>You are not in any groups yet...</p>
+        ) : ( */}
+
+                <div className="partsgrp">  You're in These Groups </div>
+
+{/* )} */}
+
         {showModal && (
           <div className="modalOverlay_NewGrp">
             <div className="container_NewGrp">

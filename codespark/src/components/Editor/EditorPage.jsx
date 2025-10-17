@@ -4,37 +4,45 @@ import Editor from '@monaco-editor/react';
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'; 
 import IconGenerator from '../IconGenerator/IconGenerator'
+import Share from '../Share/ShareFiles.jsx'
+
+
 
 const EditorPage =()=>{
-  const [groupsList, setGroupsList] = useState([]);
-  const token = localStorage.getItem("token");
+const [groupsList, setGroupsList] = useState([]);
+const [token, setToken] = useState(localStorage.getItem("token"));
 const [DataListFiles, setDataListFiles] = useState([]);
-  const [isVisible, setIsVisible] = useState(true);
-  const [selectedFilename, setSelectedFilename] = useState('');
-  const [fileCount, setFileCount] = useState(0); // Track number of created files
-  const [NextRenameMEFileName, setNextRenameMEFileName] = useState('');
+const [isVisible, setIsVisible] = useState(true);
+const [selectedFilename, setSelectedFilename] = useState('');
+const [NextRenameMEFileName, setNextRenameMEFileName] = useState('');
+const [showShareModel, setshowShareModel] = useState(false);
+const [shareData, setShareData] = useState(null); // <-- place to store fetch response
 
-  const [fn, setFn] = useState('renameMe.js'); 
 
   useEffect(() => {
     if (!token) {
       console.error("No token found in localStorage");
       return;
     }
+
 const fetch =()=>{
 
     axios
       .get("http://localhost:3001/groups", {
         headers: { Authorization: `Bearer ${token}` },
       })
+      
       .then((res) => {
         setGroupsList(res.data.ownedGroups || []);
+        setShareData(res.data.ownedGroups || []);
       })
       .catch((err) => console.error("Error fetching groups:", err));
   }
-     fetch()
 
-handleGetFiles()
+
+fetch()
+handleGetFiles()  
+
 
   }, [token]);
 
@@ -42,134 +50,76 @@ handleGetFiles()
 
 
 // console.log(groupsList.map(group => group.name));
-const handleCreateFile = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      console.error('No token found');
-      alert('Please login first');
-      return;
-    }
-
-    
-    const decoded = jwtDecode(token);
-        console.log('Decoded token:', decoded); 
-
-    const userId = decoded.id; 
-
-console.log(userId)
-     
-
-    let newFileName = 'renameMe.js';
-    if (fileCount > 0) {
-      newFileName = `renameMe(${fileCount}).js`;
-    }
-
-    // Update the state filename and file count
-    setFn(newFileName);
-    setFileCount(prev => prev + 1);
-
-
-
-    const response = await axios.post(
-      'http://localhost:3001/newfile',
-     
-
-     { user_id: userId ,
-      filename:newFileName,
-      content :"code me please !"
-    },
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
-
-    console.log('Folder created successfully:', response.data.message);
-    alert(response.data.message);
-    
-  } catch (error) {
-    console.error('Error creating folder:', error);
-    alert(error.response?.data?.error || 'Failed to create folder');
-  }
-  handleGetFiles()
-};
-
-
-
-
 const handleGetFiles = async () => {
+  if (!token) return console.error("No token found");
+
+  const decoded = jwtDecode(token);
+  const userId = decoded.id;
+
   try {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      console.error('No token found');
-      alert('Please login first');
-      return;
-    }
-
-    const decoded = jwtDecode(token);
-    const userId = decoded.id;
-
     const response = await axios.post(
       'http://localhost:3001/getFiles4Editor',
-      { userId: userId },
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
+      { userId },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    //  console.log('Files:', response.data);
+    const files = response.data || [];
 
-const files = response.data; // Should be array of filenames
-
-    // Regex to match: renameME.js or renameME(n).js
     const renameMeRegex = /^renameMe(?:\((\d+)\))?\.js$/;
-
     let maxIndex = -1;
 
-    files.forEach(filename => {
+    files.forEach((filename) => {
       const match = filename.match(renameMeRegex);
       if (match) {
-        // If no number (i.e., renameME.js), treat as index 0
         const index = match[1] ? parseInt(match[1], 10) : 0;
-        if (index > maxIndex) {
-          maxIndex = index;
-        }
+        if (index > maxIndex) maxIndex = index;
       }
     });
 
-    // Now determine the next filename
-    let nextFileName;
-    if (maxIndex === -1) {
-      // No file at all
-      nextFileName = 'renameMe.js';
-    } else if (maxIndex === 0 && files.includes('renameMe.js')) {
-      // Only renameME.js exists
-      nextFileName = 'renameMe(1).js';
-    } else {
-      nextFileName = `renameMe(${maxIndex + 1}).js`;
-    }
+    const nextFileName =
+      maxIndex === -1
+        ? 'renameMe.js'
+        : maxIndex === 0 && files.includes('renameMe.js')
+        ? 'renameMe(1).js'
+        : `renameMe(${maxIndex + 1}).js`;
 
-    console.log(`✅ Next renameMe file should be: ${nextFileName}`);
-
-    // Store for UI or creation
     setDataListFiles(files);
     setNextRenameMEFileName(nextFileName);
 
+    return { files, nextFileName }; 
+  } catch (err) {
+    console.error("Error loading files:", err);
+    return { files: [], nextFileName: "renameMe.js" };
+  }
+};
+
+const handleCreateFile = async () => {
+  if (!token) return console.error("No token found");
+
+  const decoded = jwtDecode(token);
+  const userId = decoded.id;
+
+  const { nextFileName } = await handleGetFiles();
+
+  try {
+     await axios.post(
+      'http://localhost:3001/newfile',
+      {
+        user_id: userId,
+        filename: nextFileName,
+        content: "code me please !",
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    
 
 
 
-   return setDataListFiles(response.data)
-   
-
-  } catch (error) {
-    console.error('Error loading files:', error);
-    alert(error.response?.data?.error || 'Failed to load files');
+    await handleGetFiles();
+  } catch (err) {
+    console.error("Error creating file:", err);
+    alert(err.response?.data?.error || "Failed to create file");
   }
 };
 
@@ -178,6 +128,46 @@ const files = response.data; // Should be array of filenames
 console.log("how ell s7I7",NextRenameMEFileName)
 
 
+const FileDelete=async(filename)=>{
+    try {
+
+    if (!token) {
+      console.error('No token found');
+      alert('Please login first');
+      return;
+    }
+    
+    const decoded = jwtDecode(token);
+    console.log('Decoded token:', decoded); 
+
+    const userId = decoded.id; 
+
+       await axios.delete('http://localhost:3001/deleteFile',
+
+{
+      params: {
+        filename: filename,
+        user_id: userId
+      },
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+
+    handleGetFiles()    
+    } catch (error) {
+ console.error('Error creating file:', error);
+  }
+
+
+
+}
+
+const showsharemodel =()=>{
+  setshowShareModel(true)
+}
+
 const HideWelcome=()=>{
 setIsVisible(false);
 
@@ -185,6 +175,14 @@ setIsVisible(false);
    
 
 
+function logout() {
+    localStorage.removeItem('token');
+    setToken(null); 
+    setDataListFiles([]);
+    setGroupsList([]);
+    setSelectedFilename('');
+   navigate('/login')
+}
 
 
 const navigate =useNavigate()
@@ -279,7 +277,7 @@ return (
                         <polyline points="16 17 21 12 16 7"></polyline>
                         <line x1="21" y1="12" x2="9" y2="12"></line>
                     </svg>
-                    <span>Logout</span>
+                    <span onClick={logout}>Logout</span>
                 </button>
             </div>
         </div>
@@ -305,16 +303,29 @@ return (
                   onClick= {() => setSelectedFilename(filename)}
                    key={index} 
                    className="-EDR-file-item">
-                        <IconGenerator   
-                          filename={filename}
-                            />
+                        <IconGenerator filename={filename}/>
+                         
                             <input
-
                             className='InputLikeNameFile'
                             value={filename}
                             > 
                             </input>
+                            
+                          <div
+                           className="Files-trash-icon"
+                           onClick={() => FileDelete(filename)}
+                           >
+                                <div className="trash-box">
+                                  <div className="trash-top"></div>
+                                  <div className="trash-btm">
+                                    <div className="trash-lines">
+                                      <div className="trash-line"></div>
+                                      <div className="trash-line"></div>
                                       
+                                    </div>
+                                  </div>
+                                </div>
+                                </div>                         
               </div>
 
 
@@ -386,7 +397,10 @@ return (
                                 <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
                                 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                             </svg>
-                            <span>Share</span>
+                            <span
+                            onClick={showsharemodel}
+                            // showShareModel, setshowShareModel
+                            >Share</span>
                         </button>
                         <button className="-EDR-toolbar-btn">
                             <svg className="-EDR-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -416,15 +430,32 @@ return (
  {isVisible && (
               <div  className="-EDR-welcome-screen">
                     <div className="-EDR-welcome-icon">
-<img src="./logo.png" alt="no logo"  />
+                    <img src="./logo.png" alt="no logo"  />
                     </div>
                     <h2 className="-EDR-welcome-title">Welcome to Code Spark</h2>
                     <p className="-EDR-welcome-text">Create a new file or select an existing one to start coding</p>
                 </div>
                 )}
-                </div>
- </div> </div> 
+
+
+          </div>
+ </div> 
+
+
+
+<Share 
+SelectedFileName={selectedFilename}  
+visibility={showShareModel}  
+setVisibility={setshowShareModel}   
+props={shareData}
+/>
+
+ </div> 
 )
+
+
+
+
 
 }
 

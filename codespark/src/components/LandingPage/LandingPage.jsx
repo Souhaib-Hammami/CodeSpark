@@ -4,9 +4,6 @@ import '../styles/global.css'
 
 
 
-
-
-
 export default function LandingPage() {
 
 const navigate =useNavigate()

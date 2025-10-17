@@ -26,12 +26,6 @@ const Groups=connection.define(
 
 
 
-
-
-
-
-
-
 return Groups
 
 }

@@ -29,10 +29,15 @@ const newfile=require('./routes/newfile')
 app.use("/",newfile)
 
 
-
 const loginRouter=require('./routes/users')
 app.use("/",loginRouter);
 
+
+const deleteFile=require('./routes/deleteFile')
+app.use("/",deleteFile);
+
+const searchGroup=require('./routes/searchGroup')
+app.use("/",searchGroup);
 
 
 
