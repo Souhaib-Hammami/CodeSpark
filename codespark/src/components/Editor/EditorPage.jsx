@@ -1,15 +1,35 @@
-import { useNavigate } from 'react-router-dom';
-import { useEffect,useState } from 'react';
+// For security reasons, browsers 
+// do not allow reading arbitrary local file paths
+//  directly (like "C:/Users/.../file.txt") 
+// using client-side React/JavaScript.
+
+
+
+import { useEffect,useState,useRef  } from 'react';
 import Editor from '@monaco-editor/react';
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'; 
 import IconGenerator from '../IconGenerator/IconGenerator'
 import Share from '../Share/ShareFiles.jsx'
+import NavBar from '../Navbar/NavBar'; 
+
+import { ContextMenu } from 'primereact/contextmenu';
+        
+import 'primeicons/primeicons.css';
+ import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';       
+
+
+
+
 
 
 
 const EditorPage =()=>{
-const [groupsList, setGroupsList] = useState([]);
+  const cm = useRef(null); // Reference for ContextMenu
+
+
 const [token, setToken] = useState(localStorage.getItem("token"));
 const [DataListFiles, setDataListFiles] = useState([]);
 const [isVisible, setIsVisible] = useState(true);
@@ -17,6 +37,213 @@ const [selectedFilename, setSelectedFilename] = useState('');
 const [NextRenameMEFileName, setNextRenameMEFileName] = useState('');
 const [showShareModel, setshowShareModel] = useState(false);
 const [shareData, setShareData] = useState(null); // <-- place to store fetch response
+const [joinedGrp, setjoinedGrp] = useState([]);
+  const [localFilePath, setlocalFilePath] = useState("");
+  const [fileContent, setFileContent] = useState("");
+  const [File_idFromsql, setFile_idFromsql] = useState("");
+
+const [renamingFile, setRenamingFile] = useState(null);   // file currently being renamed
+const [newFileName, setNewFileName] = useState("");       // temporary name while typing
+
+
+
+const saveFile = async () => {
+  if (!token) return alert("Please log in first!");
+  if (!selectedFilename) return alert("No file selected!");
+
+  try {
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
+
+    const res = await axios.post(
+      "http://localhost:3001/saveFile",
+      {
+        user_id: userId,
+        filename: selectedFilename,
+        content: fileContent
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (res.data.success) {
+      console.log(" File saved:", selectedFilename);
+      alert("File saved successfully!");
+    } else {
+      alert("Failed to save file");
+    }
+  } catch (err) {
+    console.error("Save failed:", err);
+    alert("Error saving file");
+  }
+};
+
+
+
+
+const handleRenameConfirm = async (oldFilename) => {
+  const trimmedName = newFileName.trim();
+  if (!trimmedName || trimmedName === oldFilename) {
+    setRenamingFile(null);
+    return;
+  }
+
+  try {
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
+
+    const res = await axios.post(
+      "http://localhost:3001/renameFile",
+      {
+        user_id: userId,
+        oldName: oldFilename,
+        newName: trimmedName
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+      
+
+    );
+
+
+
+    if (res.data.success) {
+      // Update UI instantly
+      setDataListFiles((prev) =>
+        prev.map((f) => (f === oldFilename ? trimmedName : f))
+      );
+
+      if (selectedFilename === oldFilename) {
+        setSelectedFilename(trimmedName);
+      }
+
+      localStorage.setItem("lastOpenedFile", trimmedName);
+    }
+
+
+  } catch (err) {
+    console.error("Rename failed:", err);
+    alert("Rename failed!");
+  } finally {
+    setRenamingFile(null);
+  }
+};
+
+
+
+
+
+
+
+ const items = [
+    {
+      label: 'Rename',
+      icon: 'pi pi-pencil',
+      command: () => {
+        // Add rename logic here later
+             setRenamingFile(selectedFilename); // start rename mode
+      setNewFileName(selectedFilename);  // fill input with old name
+        console.log('Rename clicked for:', selectedFilename);
+      }
+    }
+  ];
+
+
+
+
+  useEffect(() => {
+    if (File_idFromsql) {
+      geFileContent();
+    }
+  }, [File_idFromsql]);
+
+  const LocalFileDetailReader = async (filename) => {
+    try {
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+      const filePath = `users_files/createdBy_${userId}/${filename}`;
+      
+      console.log(filePath);
+      setlocalFilePath(filePath); // This triggers the useEffect above
+      return filePath;
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const getLocalFileContent = async () => {
+    try {
+      const response = await axios.post('http://localhost:3001/getLocalFileContent', {
+        filepath: localFilePath
+      });
+      
+      setFileContent(response.data);
+      console.log("File content loaded:", response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+
+
+  const geFileContent = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3001/getFileContent/${File_idFromsql}`, {
+
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+ console.log("File content loaded:", response.data);
+      setFileContent(response.data);
+     
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+const handleGetFile_4Groups =async()=>{
+
+try 
+   {
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+      const res = await axios.get(`http://localhost:3001/handleGetFile_4Groups/${userId}`,
+        {
+        headers: { Authorization: `Bearer ${token}` },
+        }
+        );
+        console.log("last",res.data.data)
+
+setjoinedGrp(res.data.data)
+
+    }
+
+catch (err){    
+  console.error("Error fetching file-group list:", err);
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+useEffect(() => {
+  if (!showShareModel && token) {
+    // When modal closes, refresh the file tree
+    handleGetFile_4Groups();
+
+  }
+}, [showShareModel]);
+
+
 
 
   useEffect(() => {
@@ -25,23 +252,48 @@ const [shareData, setShareData] = useState(null); // <-- place to store fetch re
       return;
     }
 
-const fetch =()=>{
+handleGetFile_4Groups()
 
-    axios
-      .get("http://localhost:3001/groups", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      
-      .then((res) => {
-        setGroupsList(res.data.ownedGroups || []);
-        setShareData(res.data.ownedGroups || []);
-      })
-      .catch((err) => console.error("Error fetching groups:", err));
+handleGetFiles()  
+
+
+const getjoinedGrp = async () => {
+  if (!token) {
+    console.error("No token found");
+    return;
   }
 
+  try {
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
 
-fetch()
-handleGetFiles()  
+    const res = await axios.get(`http://localhost:3001/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Update state with the joined groups
+    // setjoinedGrp(res.data.joined || []);
+    setShareData(res.data.joined || []);
+
+
+    // Log the data directly from response (not from state, which updates asynchronously)
+    // console.log("The joined groups are:", res.data.joined);
+
+  } catch (err) {
+    console.error("Error fetching joined groups:", err);
+  }
+};
+
+
+getjoinedGrp();
+
+
+
+
+
+
+
+
 
 
   }, [token]);
@@ -113,15 +365,38 @@ const handleCreateFile = async () => {
     );
 
     
-
-
-
     await handleGetFiles();
   } catch (err) {
     console.error("Error creating file:", err);
     alert(err.response?.data?.error || "Failed to create file");
   }
 };
+
+
+
+// const saveFile = async () => {
+//   if (!token) return console.error("No token found");
+
+//   const decoded = jwtDecode(token);
+//   const userId = decoded.id;
+
+
+//   try {
+//      await axios.post(
+//       'http://localhost:3001/saveFile',
+//       {
+//         user_id: userId,
+//         filename: selectedFilename,
+//         content: newcontent,
+//       },
+//       { headers: { Authorization: `Bearer ${token}` } }
+//     )
+//       } catch (err) {
+//     console.error("Error saving file:", err);
+//   }
+// };
+
+
 
 
 
@@ -175,35 +450,23 @@ setIsVisible(false);
    
 
 
-function logout() {
-    localStorage.removeItem('token');
-    setToken(null); 
-    setDataListFiles([]);
-    setGroupsList([]);
-    setSelectedFilename('');
-   navigate('/login')
-}
+// function logout() {
+//     localStorage.removeItem('token');
+//     setToken(null); 
+//     setDataListFiles([]);
+//     setGroupsList([]);
+//     setSelectedFilename('');
+//    navigate('/login')
+// }
 
 
-const navigate =useNavigate()
-const Go2Home =()=>{
-navigate('/')
-}
 
-const Go2Profil=()=>{    
-    navigate('/profil')
-}
 
 
 // const owner_id = JSON.parse(localStorage.getItem("token"));
 // navigate(`/groups/${owner_id}`);
 
 
-const Go2Groups=()=>{
-   
-    navigate(`/groups`)
-
-}
  
 
 
@@ -232,88 +495,91 @@ const draculaTheme = {
 
 
 
-
 return (
 
    <div className="-EDR-editor-container">
         
-        <div className="-EDR-top-nav">
-            <div className="-EDR-nav-left">
-          <div 
-          className="logo"
-         onClick={Go2Home}
-          >
-            <img className='logo-icon' src="./logo.png" alt="no logo" /> 
-            <span className="logo-text">Code Spark</span>
-          </div>
-            </div>
-            <div className="-EDR-nav-right">
-                <button 
-                onClick={Go2Groups}
-                className="-EDR-nav-btn">
-                    <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <span>Groups</span>
-                </button>
-                <button 
-                onClick={Go2Profil}
-                className="-EDR-nav-btn"
-                >
-                    <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M12 1v6m0 6v6"></path>
-                        <path d="M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24"></path>
-                        <path d="M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
-                    </svg>
-                    <span>Profile</span>
-                </button>
-                <button className="-EDR-nav-btn">
-                    <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    <span onClick={logout}>Logout</span>
-                </button>
-            </div>
-        </div>
+<NavBar />
 
         <div className="-EDR-main-content">
              <div className="-EDR-file-sidebar">
                 <div className="-EDR-sidebar-header">
-                    <div className="-EDR-sidebar-title">Explorer</div>
+
+<div
+  style={{
+    border: '1px solid rgba(255, 255, 255, 0.15)',
+    borderRadius: '16px',
+    padding: '1.5rem',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+    color: 'white',
+    backgroundColor: 'rgba(221, 238, 248, 1)',
+    position: 'relative', // Add this to make absolute positioning work relative to this container
+  }}
+>
+  <div className="-EDR-sidebar-title">Your Storage</div>
+  <button
+    onClick={handleCreateFile}
+    className="-EDR-new-file-btn"
+    style={{
+      position: 'absolute',
+      bottom: '0.25rem', // Match padding of the container
+      right: '0.5rem',  // Match padding of the container
+    }}
+  >
+    + New File
+  </button>
+</div>
                     
-                    <button onClick={handleCreateFile} className="-EDR-new-file-btn">+ New File</button>
                 </div>
       <div className="-EDR-file-list">
                
-              
-
             {DataListFiles.length === 0 ? (
                 <div style={{ color: '#ccc', padding: '10px' }}>No files found</div>
               ) : (
                 DataListFiles.map((filename, index) => (
 
+<div
+                  onClick={() => {
+                    setSelectedFilename(filename);
+                    LocalFileDetailReader(filename);
+                    getLocalFileContent()     
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault(); // Prevent default browser context menu
+                    setSelectedFilename(filename); // Set the selected file
+                    cm.current.show(e); // Show PrimeReact context menu
+                  }}
+                  key={index}
+                  className="-EDR-file-item"
+                >
 
-                  <div
-                  onClick= {() => setSelectedFilename(filename)}
-                   key={index} 
-                   className="-EDR-file-item">
+
                         <IconGenerator filename={filename}/>
                          
-                            <input
-                            className='InputLikeNameFile'
-                            value={filename}
-                            > 
-                            </input>
-                            
+
+                            {renamingFile === filename ? (
+    <input
+      className="InputLikeNameFile edit-mode"
+      value={newFileName}
+      autoFocus
+      onChange={(e) => setNewFileName(e.target.value)}
+      onBlur={() => handleRenameConfirm(filename)}       // When focus lost
+      onKeyDown={(e) => {
+        if (e.key === "Enter") handleRenameConfirm(filename);
+        if (e.key === "Escape") setRenamingFile(null);
+      }}
+    />
+  ) : (
+    <div className="InputLikeNameFile">{filename}</div>
+  )}
+
+                            {/* <div className='InputLikeNameFile'> {filename}</div> */}
+
                           <div
                            className="Files-trash-icon"
-                           onClick={() => FileDelete(filename)}
+                           onClick={(e) =>{
+                             e.stopPropagation() // Prevent file selection when clicking delete
+                            FileDelete(filename)}}
                            >
                                 <div className="trash-box">
                                   <div className="trash-top"></div>
@@ -325,7 +591,8 @@ return (
                                     </div>
                                   </div>
                                 </div>
-                                </div>                         
+                                </div>   
+                                  <ContextMenu ref={cm}  global model={items} className="my-context-menu" breakpoint="67px" />                    
               </div>
 
 
@@ -333,32 +600,93 @@ return (
                  
                 ))
               )}
+              <div>
 
 
+                
+              </div>
+                    <div 
+                      style={{
+                        display:'grid',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '16px',
+                        padding: '1.5rem',
+                        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+                        color: 'white',
+                        backgroundColor:'rgba(221, 238, 248, 1)'
+                        }}
+                      >
+                        <div className='-EDR-sidebar-title'>Your groups</div>
 
-
-             
-
-
-
-                    <div style={{
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '16px',
-                    padding: '1.5rem',
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-                    color: 'white',
-                    backgroundColor:'rgba(221, 238, 248, 1)'
-                    }}>
-
-
-
-                    <button className="-EDR-your-groups-btn">Your groups</button>
-                    <ul>
-                    {groupsList.map(group => 
-                    <button key={group.id} className='-EDR-groups-list-btn'>{group.name} </button>)} 
-                    </ul>
                     </div>
-                    
+
+{/* aa grp:
+renameMe(14).js
+aaaa ggggroupe:
+renameMe(14).js
+aaaa ggggroupe:
+renameMe(15).js */}
+
+{/* fixed  */}
+<div className="groups&theirFiles-tree">
+  {joinedGrp.length === 0 ? (
+    <p>You are not in any group...</p>
+  ) : (
+    (() => {
+      // Group files by group name
+      const grouped = joinedGrp.reduce((acc, item) => {
+        if (!acc[item.name]) {
+          acc[item.name] = [];
+        }
+        if (item.filename) {
+          acc[item.name].push({
+            filename: item.filename,
+            file_id: item.file_id       
+            // filepath: item.filepath,      
+            // uploader_id: item.uploader_id  
+          });
+        }
+        return acc;
+      }, {});
+
+          return Object.entries(grouped).map(([groupName, files], index) => (
+        <div key={index}>
+          <div className="groups&theirFiles-group">
+            {groupName}
+          </div>
+          {files.map((fileObj, fileIndex) => (
+            <div 
+              key={fileIndex} 
+              className="groups&theirFiles-file"
+              onClick={() => {
+
+
+                setFile_idFromsql(fileObj.file_id)
+                geFileContent()
+                // console.log("Filename:", fileObj.filename);
+                // console.log("Filepath:", fileObj.filepath);
+
+              }}
+              style={{ cursor: 'pointer' }} // Add cursor pointer to show it's clickable
+            >
+              {fileObj.filename}
+            </div>
+          ))}
+        </div>
+      ));
+    })()
+  )}
+</div>
+
+
+{/* This will group all files under the same group name together, giving you:
+```
+aa grp:
+└── renameMe(14).js
+aaaa ggggroupe:
+├── renameMe(14).js
+└── renameMe(15).js */}
+
 
 
 
@@ -368,18 +696,11 @@ return (
             <div className="-EDR-editor-area">
                 <div className="-EDR-tab-bar">
                     <div className="-EDR-tab -EDR-active">
-                        <span className="-EDR-tab-name">index.html</span>
-                        <span className="-EDR-unsaved-indicator"></span>
+                        <span className="-EDR-tab-name">{selectedFilename}</span>
+                        <span className="-EDR-unsaved-indicator">____Live </span>
                         <span className="-EDR-tab-close">×</span>
                     </div>
-                    <div className="-EDR-tab">
-                        <span className="-EDR-tab-name">style.css</span>
-                        <span className="-EDR-tab-close">×</span>
-                    </div>
-                    <div className="-EDR-tab">
-                        <span className="-EDR-tab-name">script.js</span>
-                        <span className="-EDR-tab-close">×</span>
-                    </div>
+
 
                 
 
@@ -387,10 +708,14 @@ return (
                 </div>
 
                 <div className="-EDR-editor-toolbar">
-                    <span className="-EDR-toolbar-filename">{selectedFilename}</span>
+                    <span className="-EDR-toolbar-filename">empty span</span>
                     <div className="-EDR-toolbar-actions">
-                        <button className="-EDR-toolbar-btn">
-                            <svg className="-EDR-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button 
+                        className="-EDR-toolbar-btn"
+                       onClick={showsharemodel}
+
+                        >
+                            <svg className="-EDR-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <circle cx="18" cy="5" r="3"></circle>
                                 <circle cx="6" cy="12" r="3"></circle>
                                 <circle cx="18" cy="19" r="3"></circle>
@@ -398,12 +723,14 @@ return (
                                 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                             </svg>
                             <span
-                            onClick={showsharemodel}
                             // showShareModel, setshowShareModel
-                            >Share</span>
+                            >Share This File to Group</span>
                         </button>
-                        <button className="-EDR-toolbar-btn">
-                            <svg className="-EDR-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button 
+                        className="-EDR-toolbar-btn"
+                         onClick={saveFile}
+                        >
+                            <svg className="-EDR-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                 <polyline points="17 21 17 13 7 13 7 21"></polyline>
                                 <polyline points="7 3 7 8 15 8"></polyline>
@@ -415,10 +742,12 @@ return (
 
                 <div onClick={HideWelcome} className="-EDR-code-editor">
                     <Editor 
-                    
+                    value={fileContent}
+                    onChange={(value) => setFileContent(value)}
                     height="90vh" 
                     defaultLanguage="javascript"
-                     defaultValue="// some comment" 
+                    
+                    //  defaultValue="// some comment" 
                        theme="dracula"
                     beforeMount={(monaco) => {
                         monaco.editor.defineTheme('dracula', draculaTheme);

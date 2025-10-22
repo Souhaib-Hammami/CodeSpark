@@ -1,8 +1,8 @@
 
 //const fs=require('fs') 8alta yelzem promises
-// fs (callback version) ❌
+// fs (callback version) 
 
-// fs.promises (promise/async version) ✅
+// fs.promises (promise/async version) 
 
 const fs=require('fs').promises
 const path = require('path');

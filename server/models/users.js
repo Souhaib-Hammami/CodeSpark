@@ -23,8 +23,14 @@ const users=(connection,DataTypes)=>{
         type:DataTypes.STRING,
         allowNull : false
 
-        }
+        },
 
+
+        bio:{
+            type:DataTypes.STRING,
+            allowNull:true,
+            unique: false
+        }
 
     })
 

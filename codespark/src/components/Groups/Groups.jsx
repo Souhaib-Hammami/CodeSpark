@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from 'jwt-decode'; 
 import TypeIt from "typeit"
 import axios from "axios";
+import NavBar from '../Navbar/NavBar'; 
 
 const Groups = () => {
   const [groupsList, setGroupsList] = useState([]);
@@ -13,47 +14,13 @@ const Groups = () => {
   const [groupName, setGroupName] = useState("");
   const [groupDesc, setGroupDesc] = useState("");
   const [groupsSearch, setGroupsSearch] = useState([]);
-
-
-const handleClick = (groupId) => {
-  setGroupsSearch(prev => 
-    prev.map(group => {
-      if (group.id === groupId && group.joinState !== "joined") {
-        
-        setTimeout(() => {
-          setGroupsSearch(innerPrev => 
-            innerPrev.map(g => 
-              g.id === groupId ? { ...g, joinState: "joined" } : g
-            )
-          );
-        }, 700);
-        
-        return { ...group, joinState: "waiting" };
-      }
-      return group;
-    })
-  );
-};
-
-
-
-
-  const navigate = useNavigate();
+    const [joinedGrp, setjoinedGrp] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem("token"));
+const navigate = useNavigate();
 const [input,setinput]=useState('')
- const [token, setToken] = useState(localStorage.getItem("token"));
 
 
-
-
-  useEffect(() => {
-    if (!token) {
-      console.error("No token found in localStorage");
-      return;
-    }
-
-      const fetch =()=>{
-
-
+ const fetch =()=>{
     axios
       .get("http://localhost:3001/groups",{
        
@@ -63,12 +30,110 @@ const [input,setinput]=useState('')
         setGroupsList(res.data.ownedGroups || []);
       })
       .catch((err) => console.error("Error fetching groups:", err));
-
-
   }
 
 
-fetch()
+
+
+                            const handleClick = async(groupId) => 
+                      {
+
+                              if (!token) return console.error("No token found");
+
+                              const decoded = jwtDecode(token);
+                              const userId = decoded.id;
+
+
+                            const selectedGroup =groupsSearch.find((g) => g.id === groupId) || groupsList.find((g) => g.id === groupId);
+
+                              setGroupsSearch(prev => 
+                                prev.map(group => {
+                                  if (group.id === groupId && group.joinState !== "joined") {
+                                    
+                                    setTimeout(() => {
+                                      setGroupsSearch(innerPrev => 
+                                        innerPrev.map(g => 
+                                          g.id === groupId ? { ...g, joinState: "joined" } : g
+                                        )
+                                      );
+                                    }, 700);
+                                    
+                                    return { ...group, joinState: "waiting" };
+                                  }
+                                  return group;
+                                })
+                              );
+
+                            // console.log("teklikit")
+                            try
+                            {   
+                                      const joinG = 
+                                      {
+                              groupId: selectedGroup.id,
+                              groupN: selectedGroup.name,
+                              userId: userId,
+                                        };
+                                await axios.post("http://localhost:3001/joinGrp", joinG, {
+                                  headers: { Authorization: `Bearer ${token}` },
+                                });
+                                
+                                
+                              }
+                            catch (error) {
+                                  console.error("Error joining group:", error);
+                            };
+                            
+                            getjoinedGrp()
+                      }
+
+
+
+
+
+
+
+
+
+
+
+const getjoinedGrp = async () => {
+  if (!token) {
+    console.error("No token found");
+    return;
+  }
+
+  try {
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
+
+    const res = await axios.get(`http://localhost:3001/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Update state with the joined groups
+    setjoinedGrp(res.data.joined || []);
+
+    // Log the data directly from response (not from state, which updates asynchronously)
+    // console.log("The joined groups are:", res.data.joined);
+
+  } catch (err) {
+    console.error("Error fetching joined groups:", err);
+  }
+};
+
+
+
+  useEffect(() => {
+    fetch()  
+    if (!token) {
+      console.error("No token found in localStorage");
+      return;
+   
+    }
+
+
+getjoinedGrp();
+
 
   }, [token]);
 
@@ -88,15 +153,11 @@ setinput(query)
 try {
  const result= await axios.get(`http://localhost:3001/searchGroup`,
     {
-    params: { query }
-  }
-    ,
-    {
-    headers:{Authorization:`Bearer ${token}`}
+    params: { query },
+     headers:{Authorization:`Bearer ${token}`}
   }
 )
 setGroupsSearch(result.data.data)
-console.log(result)
 } catch (error) {
   console.log(error)
 }
@@ -118,8 +179,8 @@ console.log(result)
     const decoded = jwtDecode(token);
     const owner_id = decoded?.id || decoded?.user_id; // depends on your token payload
 
-    console.log("Decoded token:", decoded);
-    console.log("Owner ID from token:", owner_id);
+    // console.log("Decoded token:", decoded);
+    // console.log("Owner ID from token:", owner_id);
 
     if (!owner_id) {
       console.error("No user ID found in token");
@@ -147,9 +208,8 @@ console.log(result)
     
     setGroupsList(res.data.ownedGroups || []);
 
-    // Handle success
     setShowModal(false);
-        setGroupName("");
+    setGroupName("");
     setGroupDesc("");
 
   } catch (err) {
@@ -223,7 +283,6 @@ const formatDate = (isoString) => {
 
 const imageOptions = ['blue_grp.png', 'orange_grp.png', 'green_grp.png','purpul_grp.png'];
 
-  const Go2Editor = () => navigate("/editor");
 
  
 
@@ -233,55 +292,9 @@ const imageOptions = ['blue_grp.png', 'orange_grp.png', 'green_grp.png','purpul_
     <div className="GrpScreen">   
       <div className="GrpContainer">
 
+      <NavBar />
 
- <div className="-EDR-top-nav">
-            <div className="-EDR-nav-left">
-          <div 
-          className="logo"
-        //  onClick={Go2Home}
-          >
-            <img className='logo-icon' src="./logo.png" alt="no logo" /> 
-            <span className="logo-text">Code Spark</span>
-          </div>
-            </div>
-            <div className="-EDR-nav-right">
-                <button 
-                
-                 onClick={Go2Editor}
-                className="-EDR-nav-btn">
-                    <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <span>Editor</span>
 
-                </button>
-                <button 
-                // onClick={Go2Profil}
-                className="-EDR-nav-btn"
-                >
-                    <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M12 1v6m0 6v6"></path>
-                        <path d="M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24"></path>
-                        <path d="M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
-                    </svg>
-                    <span>Profile</span>
-                </button>
-                <button className="-EDR-nav-btn">
-                    <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    <span 
-                    // onClick={logout}
-                    >Logout</span>
-                </button>
-            </div>
-        </div>
 
         </div>
 
@@ -351,9 +364,6 @@ const currentState = group.joinState || "join";
                     <div className="GrpCardHeaderText">
                       
                             <h3 className="GrpCardTitle">{group.name}</h3>
-
-
-            
                       <p className="GrpMutedText">{group.description}</p>
                     </div>
 
@@ -361,7 +371,6 @@ const currentState = group.joinState || "join";
                                   id="join-btnActivation"
                                   onClick={()=>handleClick(group.id)}
                                 className={`join-btn join-btn--${currentState}`} 
-
                                 >
                                   <span className="join-btn__icon"></span>
                                   <span className="join-btn__text">
@@ -456,6 +465,85 @@ const currentState = group.joinState || "join";
         ) : ( */}
 
                 <div className="partsgrp">  You're in These Groups </div>
+
+
+
+
+
+ {joinedGrp.length === 0 ? (
+          <p>your are not in any group...</p>
+        ) : (
+          <div className="GrpGrid">
+            {joinedGrp.map((group) => {
+              const randomImage =
+                imageOptions[Math.floor(Math.random() * imageOptions.length)];
+
+              return (
+                <div key={group.group_id} className="GrpCard">
+
+                  <div className="GrpCardHeader">
+                    
+                    <img 
+                    src={randomImage} 
+                    alt="Group icon" 
+                    width="50"   
+                    style={{
+                        border: "2px solid #ccc",
+                        borderRadius: "70%",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.3)"
+                      }}/>
+                      
+                    <div className="GrpCardHeaderText">
+                      
+                      <h3 className="GrpCardTitle">{group.group_name}</h3>
+                      {/* magaditech el description fel groups-member table */}
+                      <p className="GrpMutedText">{group.group_description}</p>
+                    </div>
+                    <div className="GrpDropdown">
+                      <img
+                        className="groupSetting"
+                        src="GroupSetting.png"
+                        alt="Group Setting"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="GrpCardFooter">
+                    <div className="GrpMembersInfo">
+                      <span className="GrpIconSm GrpMutedText">👥</span>
+                      <span className="GrpTextSm GrpMutedText">3 members</span>
+                    </div>
+
+                    <div>
+                      <br />
+                      {/* mchet s7i7a walh mana3ref "lleh" */}
+                      {formatDate(group.createdAt)}
+                      <br />
+                    </div>
+
+                    <span className="GrpBadge">
+                      <span>⭐</span>
+                      <span className="GrpCapitalize">{group.role}</span>
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
 {/* )} */}
 

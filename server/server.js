@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 
 const express=require('express')
 
@@ -11,6 +12,7 @@ app.listen(port,()=>console.log('API server Opened on port : '+ port ))
 const cors=require('cors')
 app.use(cors())
 
+app.use("/users_files",express.static(path.join(__dirname, 'users_files')))
 
 const allGroupsE=require('./routes/editor')
 app.use("/",allGroupsE)
@@ -39,8 +41,47 @@ app.use("/",deleteFile);
 const searchGroup=require('./routes/searchGroup')
 app.use("/",searchGroup);
 
+const joinGrp=require('./routes/joinGrp')
+app.use("/",joinGrp);
+
+const joinedGrp=require('./routes/joinedGrp')
+app.use("/",joinedGrp);
 
 
+const sharedFiles=require('./routes/shareFiles')
+app.use("/",sharedFiles);
+
+
+
+const getFile_4Groups=require('./routes/getFile_4Groups')
+app.use("/",getFile_4Groups);
+
+
+
+const getLetterProfile=require('./routes/getLetterProfile')
+app.use("/",getLetterProfile);
+
+
+
+const getFileContent=require('./routes/getFileContent')
+app.use("/",getFileContent);
+
+
+
+const getLocalFileContent=require('./routes/getLocalFileContent')
+app.use("/",getLocalFileContent);
+
+
+
+const renameFile=require('./routes/renameFile')
+app.use("/",renameFile);
+
+
+const saveFile=require('./routes/saveFile')
+app.use("/",saveFile);
+
+const getUserInfoFromdb=require('./routes/getUserInfoFromdb')
+app.use("/",getUserInfoFromdb);
 
 const TestConection =require('./postgresql/TestConection')
 TestConection()
@@ -57,7 +98,7 @@ const createGroups = require('./controllers/createGroup');
 
 const synchronizeTables =async () => {
     try {
-        pgconnection.sync({ force: true })
+        pgconnection.sync({ alter: true })
         console.log("alter the existing tables to match your models without data loss")
     } catch (error) {
         console.log(error)

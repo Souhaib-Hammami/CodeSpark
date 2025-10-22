@@ -1,35 +1,64 @@
 // Share.jsx
 import { useState } from 'react';
-
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 const Share = ({ SelectedFileName, visibility, setVisibility, props }) => {
 
   
   const [selectedGroups, setSelectedGroups] = useState(new Set());
-
-  const toggleGroup = (groupId) => {
+//console.log(props)
+  const toggleGroup = (group_id) => {
     setSelectedGroups(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(groupId)) {
-        newSet.delete(groupId);
+      if (newSet.has(group_id)) {
+        newSet.delete(group_id);
       } else {
-        newSet.add(groupId);
+        newSet.add(group_id);
       }
       return newSet;
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const selectedGroupNames = props
-      .filter((item, index) => selectedGroups.has(item.id || index))
-      .map((item) => item.name);
-    
-    console.log('Sharing with groups:', selectedGroupNames);
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return alert("No token found!");
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
+
+    const selectedGroupsData = props.filter(item =>
+      selectedGroups.has(item.group_id)
+    );
+
+    const groupIds = selectedGroupsData.map(item => item.group_id);
+    const selectedGroupNames = selectedGroupsData.map(item => item.group_name);
+
+    await axios.post(
+      "http://localhost:3001/shareFiles",
+      {
+        userId,
+        selectedFile: SelectedFileName,
+        groupIds
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    console.log("Sharing with groups:", selectedGroupNames);
     alert(`File shared successfully with:\n${selectedGroupNames.join('\n')}`);
-    
+
     setSelectedGroups(new Set());
     setVisibility(false);
-  };
+
+  } catch (error) {
+    console.error("Error sharing file:", error);
+    alert("Error sharing file!");
+  }
+};
+
 
   const handleCancel = () => {
     setSelectedGroups(new Set());
@@ -66,12 +95,14 @@ const Share = ({ SelectedFileName, visibility, setVisibility, props }) => {
                   props.map((item, index) => (
                     <div
                       key={item.id || index}
-                      className={`groupItem_sharefiles ${
-                        selectedGroups.has(item.id || index) ? 'selected' : ''
-                      }`}
-                      onClick={() => toggleGroup(item.id || index)}
+className={`groupItem_sharefiles ${
+  selectedGroups.has(item.group_id) ? 'selected' : ''
+}`}
+
+                     onClick={() => toggleGroup(item.group_id)}
+
                     >
-                      <span className="groupName_sharefiles">{item.name}</span>
+                      <span className="groupName_sharefiles">{item.group_name}</span>
                       <div className="checkIcon_sharefiles">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="3">
                           <polyline points="20 6 9 17 4 12"></polyline>

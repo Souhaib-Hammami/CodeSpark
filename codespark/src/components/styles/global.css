@@ -859,6 +859,8 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
             gap: 0.5rem;
         }
 
+
+
         .-EDR-nav-btn {
             display: flex;
             align-items: center;
@@ -866,11 +868,11 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
             padding: 0.5rem 1rem;
             background: transparent;
             border: none;
-            border-radius: 8px;
             cursor: pointer;
             font-size: 0.875rem;
             font-weight: 500;
-            color: #4b5563;
+            color: #67625f;
+            align-items:center;
             transition: all 0.2s ease;
         }
 
@@ -881,8 +883,19 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
         }
 
         .-EDR-nav-icon {
-            width: 18px;
-            height: 18px;
+         filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(5767%) hue-rotate(342deg) brightness(99%) contrast(87%);
+         /* color:#ec842f; */ 
+            width: 30px;
+            height: 30px;
+        }
+                .-EDR-nav-icon-alpha {
+         filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(5767%) hue-rotate(342deg) brightness(99%) contrast(87%);
+         /* color:#ec842f; */ 
+         padding: 3px;
+            width: 30px;
+             border: 3px solid;
+              border-radius: 5px;
+            height: 30px;
         }
 
         /* Main Content Area */
@@ -911,6 +924,7 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
         }
 
         .-EDR-sidebar-title {
+            
             font-size: 0.75rem;
             font-weight: 700;
             color: #6b7280;
@@ -919,6 +933,74 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
             margin-bottom: 1rem;
         }
 
+        /* === Custom Context Menu Styling === */
+
+.my-context-menu {
+  /* Adjust width & padding */
+  max-width: 100px;
+  font-size: 10px !important;    /* smaller text */
+  font-weight: 900;
+  border-radius: 10px !important;
+  overflow: hidden;
+  border: none !important;
+  background: #ffffff !important; /* deep indigo background */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+
+
+/* Menu item styling */
+.my-context-menu .p-menuitem {
+  padding: 0px !important;
+  margin: 0px;
+}
+
+.my-context-menu .p-menuitem-link {
+  padding: 2px;
+  background: transparent !important;
+  color: #e0e0ff !important;  /* text color */
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Hover effect */
+.my-context-menu .p-menuitem-link:hover {
+  color: #fff !important;
+}
+
+/* Optional icon color */
+.my-context-menu .pi {
+  color: #ca4066 !important;  /* accent pink-red from your palette */
+  padding-left: 5px;
+}
+
+/* ken t7eb subtle border lines */
+.my-context-menu .p-menu-separator {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.InputLikeNameFile {
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.InputLikeNameFile:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Rename edit mode */
+.InputLikeNameFile.edit-mode {
+  border: 1px solid #ca4066;
+  background: #fff;
+  color: #333;
+  outline: none;
+  width: 90%;
+  border-radius: 6px;
+  font-size: 13px;
+  padding: 3px 6px;
+}
 
         .-EDR-your-groups-btn {
             width: 100%;
@@ -947,17 +1029,18 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
 
 
         .-EDR-new-file-btn {
-            width: 100%;
-            padding: 0.75rem;
+            width: 40%;
+            padding: 0.45rem;
   --color-blue-600: #2563eb;
-  --color-purple-600: #9333ea;
+  /* --color-purple-600: #9333ea; */
+  --color-purple-600: #00fd9c;
   background: linear-gradient(to right, var(--color-blue-600), var(--color-purple-600));     
          color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 600;
+            font-size: 0.675rem;
+            font-weight: 500;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
         }
@@ -1156,66 +1239,46 @@ background-color: #f3f4f6;
 }
 
    
+.groups\&theirFiles-tree {
+    font-family: 'RedditMono';
+    background-color: #fff;
+    color: #000;
+    padding: 20px;
+    line-height: 1.4;
+    font-size: 14px;
+}
 
-/*///* eli zetha group list*/
-.-EDR-groups-list-btn {
-    display: block;
-    width: 100%;
-    margin-bottom: 3px;
-    padding: 1.25rem 2rem;
-height: 50px;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 6px;
-
-    font-size: 1rem;
-    font-family: 'JosefinSans-VariableFont_wght', sans-serif;
-    letter-spacing: 0.8px;
+.groups\&theirFiles-group {
+    color: #000;
+    margin: 10px 0 5px 0;
+    font-family: 'RedditMono';
+    background: none;
+    border: none;
+    padding: 0;
+    font-weight: 700;
+    font-size: 14px;
     text-align: left;
+    border-bottom: 2px;
+    
+}
 
+.groups\&theirFiles-file {
+    color: #000;
+    margin-left: 30px;
     cursor: pointer;
-    transition: all 0.35s ease;
-    position: relative;
-    overflow: hidden;
 
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), inset 0 0 0 rgba(255, 255, 255, 0);
-    backdrop-filter: blur(6px);
 }
 
-/* Hover effect with glossy overlay */
-.-EDR-groups-list-btn::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        120deg,
-        rgba(255, 255, 255, 0.05) 0%,
-        rgba(255, 255, 255, 0.1) 50%,
-        rgba(255, 255, 255, 0.05) 100%
-    );
-    transition: all 0.45s ease;
-    z-index: 0;
+.groups\&theirFiles-file::before {
+    content: '└── ';
+    margin-right: 5px;
 }
 
-/* Add slight movement and stronger shadow on hover */
-.-EDR-groups-list-btn:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.25);
-    border-color: rgba(255, 255, 255, 0.25);
+.groups\&theirFiles-file:not(:last-of-type)::before {
+    content: '├── ';
 }
 
-.-EDR-groups-list-btn:hover::after {
-    left: 100%;
-}
 
-.-EDR-groups-list-btn:active {
-    transform: scale(0.98);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-}
 
 
 
@@ -1298,6 +1361,7 @@ height: 50px;
         }
 
         .-EDR-unsaved-indicator {
+          
             width: 8px;
             height: 8px;
             background: linear-gradient(135deg, #14b8a6, #0d9488);
@@ -1526,17 +1590,24 @@ height: 50px;
 /* ===== Root Layout ===== */
 .profilEDR-root {
   min-height: 100vh;
-  padding: 2rem 0;
+  padding: 1rem ;
   font-family: 'Inter', sans-serif;
-  color: #111827;
-  background: linear-gradient(to bottom, #eff6ff, #ffffff);
+      flex-wrap: wrap;
+    flex-direction: row;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 
 }
 
 .profilEDR-container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
+ padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+    background: linear-gradient(to bottom, #eff6ff, #ffffff);
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(17, 17, 26, 0.1);
 }
 
 
@@ -1823,7 +1894,7 @@ flex-direction: row;
  display: flex;
   justify-content: center;
   align-items: flex-start;
-             padding: 0  1rem 0 0;
+ padding: 0  1rem 0 1;
 }
 
 .GrpContainer {
@@ -2144,10 +2215,12 @@ flex-direction: row;
 .GrpBadge {
   background-color: #eff6ff;
   color: #1d4ed8;
+  width: 30%;
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
   font-size: 0.75rem;
   display: flex;
+  justify-content: center;
   align-items: flex-start;
   gap: 0.25rem;
 }
