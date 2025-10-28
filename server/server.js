@@ -83,6 +83,21 @@ app.use("/",saveFile);
 const getUserInfoFromdb=require('./routes/getUserInfoFromdb')
 app.use("/",getUserInfoFromdb);
 
+
+
+
+const UpdateUserInfo=require('./routes/updateUserInfo')
+app.use("/",UpdateUserInfo);
+
+
+const unjoinGrp=require('./routes/unjoinGrp')
+app.use("/",unjoinGrp)
+
+
+const deleteGrp=require('./routes/deleteGrp')
+app.use("/",deleteGrp)
+
+
 const TestConection =require('./postgresql/TestConection')
 TestConection()
 
@@ -98,7 +113,7 @@ const createGroups = require('./controllers/createGroup');
 
 const synchronizeTables =async () => {
     try {
-        pgconnection.sync({ alter: true })
+        pgconnection.sync({ alter : true })
         console.log("alter the existing tables to match your models without data loss")
     } catch (error) {
         console.log(error)

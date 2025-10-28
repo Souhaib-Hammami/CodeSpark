@@ -12,11 +12,10 @@ import { jwtDecode } from 'jwt-decode';
 import IconGenerator from '../IconGenerator/IconGenerator'
 import Share from '../Share/ShareFiles.jsx'
 import NavBar from '../Navbar/NavBar'; 
-
 import { ContextMenu } from 'primereact/contextmenu';
         
 import 'primeicons/primeicons.css';
- import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';       
 
@@ -38,10 +37,9 @@ const [NextRenameMEFileName, setNextRenameMEFileName] = useState('');
 const [showShareModel, setshowShareModel] = useState(false);
 const [shareData, setShareData] = useState(null); // <-- place to store fetch response
 const [joinedGrp, setjoinedGrp] = useState([]);
-  const [localFilePath, setlocalFilePath] = useState("");
-  const [fileContent, setFileContent] = useState("");
-  const [File_idFromsql, setFile_idFromsql] = useState("");
-
+const [localFilePath, setlocalFilePath] = useState("");
+const [fileContent, setFileContent] = useState("");
+const [File_idFromsql, setFile_idFromsql] = useState("");
 const [renamingFile, setRenamingFile] = useState(null);   // file currently being renamed
 const [newFileName, setNewFileName] = useState("");       // temporary name while typing
 
@@ -411,6 +409,9 @@ const FileDelete=async(filename)=>{
       alert('Please login first');
       return;
     }
+
+        const confirmed = window.confirm(`Are you sure you want to delete "${filename}"?`);
+    if (!confirmed) return; // Cancel if user clicks "Cancel"
     
     const decoded = jwtDecode(token);
     console.log('Decoded token:', decoded); 
@@ -507,13 +508,13 @@ return (
 
 <div
   style={{
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-    borderRadius: '16px',
-    padding: '1.5rem',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-    color: 'white',
-    backgroundColor: 'rgba(221, 238, 248, 1)',
-    position: 'relative', // Add this to make absolute positioning work relative to this container
+
+
+    position: 'relative',
+    backgroundImage: 'linear-gradient(to right, #d1a0005b  51%, #ffa201ff  100%)',
+        borderRadius: '12px',
+    boxShadow: '0 4px 12px rgba(255, 255, 255, 0.3)', // white shadow
+    padding: '16px',
   }}
 >
   <div className="-EDR-sidebar-title">Your Storage</div>
@@ -577,11 +578,13 @@ return (
 
                           <div
                            className="Files-trash-icon"
-                           onClick={(e) =>{
-                             e.stopPropagation() // Prevent file selection when clicking delete
-                            FileDelete(filename)}}
                            >
-                                <div className="trash-box">
+                                <div className="trash-box"       
+                              onClick={(e) =>{
+                            e.stopPropagation() // Prevent file selection when clicking delete
+                            FileDelete(filename)}}
+
+                                >
                                   <div className="trash-top"></div>
                                   <div className="trash-btm">
                                     <div className="trash-lines">
@@ -605,20 +608,30 @@ return (
 
                 
               </div>
+                  <div
+                  style={{
+              padding:'16px'               
+                     }}
+                  >
                     <div 
                       style={{
-                        display:'grid',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        borderRadius: '16px',
-                        padding: '1.5rem',
-                        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-                        color: 'white',
-                        backgroundColor:'rgba(221, 238, 248, 1)'
+                position: 'relative',
+//                backgroundImage: 'linear-gradient(to right, #d1a0005b  51%, #ffa201ff  100%)',
+                backgroundImage: 'linear-gradient(to right, #bab5ae27  51%, #f0e3cd76  100%)',
+
+                color: '#f8f8f2',        // text color
+                borderRadius: '12px',
+                padding:'1rem',
+                    boxShadow: '0 4px 12px rgba(255, 255, 255, 0.3)', // white shadow
+
                         }}
                       >
-                        <div className='-EDR-sidebar-title'>Your groups</div>
-
+                        <div className='-EDR-sidebar-title'> Your groups</div>
                     </div>
+
+
+                  </div>
+
 
 {/* aa grp:
 renameMe(14).js
@@ -698,7 +711,7 @@ aaaa ggggroupe:
                     <div className="-EDR-tab -EDR-active">
                         <span className="-EDR-tab-name">{selectedFilename}</span>
                         <span className="-EDR-unsaved-indicator">____Live </span>
-                        <span className="-EDR-tab-close">×</span>
+                        <span className="-EDR-tab-close"></span>
                     </div>
 
 

@@ -1,4 +1,4 @@
-const { groups_members } = require('../models');
+const { groups_members,groups } = require('../models');
 
 const joinedGrp = async (req, res) => {
   try {
@@ -8,7 +8,11 @@ const joinedGrp = async (req, res) => {
     console.log("User ID:", userId);
 
     const joined = await groups_members.findAll({
-      where: { user_id: userId }
+      where: { 
+        user_id: userId,
+        role: ['editor', 'viewer'],
+      }
+
     });
     console.log(joined)
     return res.status(200).json({

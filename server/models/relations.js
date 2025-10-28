@@ -19,7 +19,14 @@ files.belongsTo(groups, { foreignKey: 'group_id'});
 // 1 M
 users.hasMany(files, { foreignKey: 'uploader_id',onDelete: 'SET NULL'});
 files.belongsTo(users, {foreignKey: 'uploader_id'});
+
+
+
+
+
 }
+
+
 
 module.exports=ApplyRelation
 

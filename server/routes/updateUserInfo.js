@@ -1,10 +1,13 @@
+
 const express=require('express')
+
 const router=express.Router()
+
 
 const { isAuthenticated } =require ('../middleware/isAuth')
 
-const joinedGrp=require('../controllers/joinedGrp')
+const updateUserInfo=require('../controllers/updateUserInfo')
 
-router.get("/:userId",joinedGrp)
+router.post("/updateUserInfo",updateUserInfo)
 
 module.exports=router

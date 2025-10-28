@@ -22,7 +22,8 @@ try {
 const groups_m= await groups_members.create({ 
 group_id: groupId,
 group_name:groupN, 
-user_id: userId })
+user_id: userId, 
+})
 
 res.status(201).json({ 
       message: "Successfully joined the group",

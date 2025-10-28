@@ -24,28 +24,30 @@ const groups_members = (connection, DataTypes) => {
       // // primaryKey: true,
       // onDelete: 'CASCADE'
 
-type: DataTypes.INTEGER,
-  allowNull: false,
-  references: { model: "groups", key: "id" },
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE"
-    },
-    group_name: {
-  type: DataTypes.STRING,
-  allowNull: false
-},
+      type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: "groups", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+          },
+            group_name: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+
+
 
 
 role: {
         type: DataTypes.ENUM({
-          values: ['owner', 'admin', 'editor', 'viewer'],
+          values: ['owner', 'editor', 'viewer'],
         }),
         allowNull: false,
-        defaultValue: 'viewer',
+        defaultValue: 'editor',
         // 3amlletni mochkel manajem n6adem el bEND sequilize-postgresql ken bel "force" 
         // comment: 'owner: full control, admin: manage members, editor: edit files, viewer: read-only'
       }
-  
+      
 
 
   });
