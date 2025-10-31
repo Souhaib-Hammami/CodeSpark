@@ -9,14 +9,8 @@
 background: linear-gradient(to bottom, #eff6ff, #ffffff);
   
 }
-.stars-container {
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  inset: 0;
-  z-index: -10;
-  pointer-events: none;
-}
+
+
 .container {
   max-width: 1200px;
   margin: 0 auto;

@@ -1,8 +1,7 @@
 import { Code2, Users, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/global.css';
-import { StarsCanvas } from './StarBackground';
-import { useMemo } from 'react';
+// import { StarsCanvas } from './StarBackground';
 
 export default function LandingPage() {
 
@@ -19,7 +18,7 @@ export default function LandingPage() {
   return (
     <div className="screen landing-gradient">
       {/* Star Background */}
-      <StarsCanvas />
+      {/* <StarsCanvas /> */}
 
       <header className="landing-header">
         <div className="container header-section">
@@ -182,3 +181,5 @@ export default function LandingPage() {
     </div>
   );
 }
+
+
