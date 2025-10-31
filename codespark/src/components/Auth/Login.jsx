@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/global.css';
 import { motion, useAnimation } from 'framer-motion';
-
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password_hash, setPassword] = useState('');
@@ -13,22 +14,99 @@ const Login = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const controls = useAnimation();
 
+
+  const [Rusername, setRusername] = useState('');
+  const [Remail, setRemail] = useState('');
+
+  const [Rpassword_hash, setRpassword] = useState('');
+
+
+
+const register = async(e) => {
+  e.preventDefault();  // CRITICAL: Prevent form reload
+
+  try {
+    // Step 1: Register the user
+    const response = await axios.post("http://localhost:3001/register", {
+      username: Rusername,
+      email: Remail,
+      password_hash: Rpassword_hash
+    });
+    
+    console.log("Registration response:", response);
+
+    if (response.status === 200 || response.status === 201) {
+      // Step 2: Auto-login immediately after successful registration
+      const loginResponse = await axios.post('http://localhost:3001/login', {
+        username: Rusername,
+        password: Rpassword_hash
+      });
+
+      // Step 3: Store token and redirect to editor
+      const { token } = loginResponse.data;
+      localStorage.setItem('token', token);
+      setToken(token);
+      
+      // Step 4: Clear form fields
+      setRusername('');
+      setRemail('');
+      setRpassword('');
+      
+      // Step 5: Navigate to editor
+
+      navigate('/editor');
+    }
+    
+  } catch (error) {
+    console.log(error);
+    alert(error.response?.data?.message || "Registration failed. Please try again.");
+  }
+}
+
+
+
+
+
   const handleFlip = async () => {
     setIsFlipped((prev) => !prev);
     await controls.start({ rotateY: isFlipped ? 0 : 180 });
   };
 
+const [visible, setVisible] = useState(false);
+    const [position, setPosition] = useState('center');
+    const footerContent = (
+        <div>
+            <Button label="that's OK!" icon="pi pi-check" onClick={() => setVisible(false)} autoFocus />
+        </div>
+    );
+
+ const show = () => {
+        setPosition('bottom-left');
+        setVisible(true);
+
+    };
+
+
+
+
+
   const handleLogin = (e) => {
     e.preventDefault();
     axios
-      .post('http://localhost:3001/login', { username, password_hash })
+      .post('http://localhost:3001/login', { username,  password: password_hash })
       .then((response) => {
         const { token } = response.data;
         localStorage.setItem('token', token);
         setToken(token);
         if (response.status === 200) navigate('/editor');
       })
-      .catch((error) => console.error('Login failed:', error));
+      .catch((error) =>{
+                console.error('Lllllogin failed:', error)
+      show() 
+      }
+
+    );
+    
   };
 
   const handleSocialLogin = (platform) => {
@@ -39,8 +117,31 @@ const Login = () => {
   const navigate = useNavigate();
   const handleHome = () => navigate('/');
 
+
+
+
+
+
+
   return (
     <div className="Clogin">
+
+
+{/* ///the stupid dialog for errors */}
+
+ <div className="card">
+
+            <Dialog 
+            header="⚠️⚠️⚠️" 
+            visible={visible} position={position} style={{ width: '25vw' ,padding:'0px',fontSize:'small' }} onHide={() => {if (!visible) return; setVisible(false); }} footer={footerContent} draggable={false} resizable={true}>
+                <p className="m-0">
+                    Please check your Username and your Password
+                </p>
+            </Dialog>
+        </div>
+
+
+
       {/* ----- TITLE BAR ----- */}
       <div className="title-bar">
         <div className="title-bar-left">
@@ -265,17 +366,48 @@ const Login = () => {
                     <h1 className="login-title">Sign Up</h1>
                     <p className="login-subtitle">Create a new account</p>
                   </div>
-                  <form className="form-login-input">
+                  <form
+                  onSubmit={register}
+                  className="form-login-input"
+                  >
                     <div className="form-group">
-                      <input type="text" className="form-input" placeholder="Enter your username" required />
+                      <input 
+                      type="text" 
+                                              value={Rusername}
+
+                      className="form-input" 
+                      placeholder="Enter your username" 
+                      onChange={(e) => setRusername(e.target.value)}
+
+                      
+                      required />
                     </div>
                     <div className="form-group">
-                      <input type="email" className="form-input" placeholder="Enter your email" required />
+                      <input 
+                      type="email"
+                       className="form-input" 
+                       placeholder="Enter your email"
+                      onChange={(e) => setRemail(e.target.value)}
+                        value={Remail}
+
+                       required />
                     </div>
                     <div className="form-group">
-                      <input type="password" className="form-input" placeholder="Enter your password" required />
+                      <input 
+                      type="password" 
+                      className="form-input" 
+                      placeholder="Enter your password" 
+                       onChange={(e) => setRpassword(e.target.value)}
+                        value={Rpassword_hash}
+
+                      required />
                     </div>
-                    <button type="submit" className="login-button">Sign Up</button>
+                    <button
+                     type="submit" 
+                     className="login-button"
+                     
+                     
+                     >Sign Up</button>
                   </form>
                   <div className="login-footer">
                     <a href="#" onClick={handleFlip}>Back to Login</a>

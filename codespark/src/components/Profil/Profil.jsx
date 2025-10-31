@@ -65,17 +65,8 @@ const updatePassword = async () => {
       current_password: currentPw,
     });
 
-    if (res.status === 400) {
-      alert("⚠️ Current password is required to change your password.");
-      return;
-    }
-
-    if (res.status === 401) {
-      alert("❌ Current password is incorrect.");
-      return;
-    }
-
-    if (res.status === 200) {
+    // Since UpdateUserInfos returns response.data, check the data directly
+    if (res.success) {  // ← Check res.success instead of res.status
       alert("✅ Password updated successfully!");
       setCurrentPw("");
       setpw("");
@@ -86,9 +77,24 @@ const updatePassword = async () => {
     alert("❌ Unexpected server response.");
   } catch (error) {
     console.error("Error updating password:", error);
-    alert("❌ Failed to update password.");
+    
+    if (error.response?.status === 401) {
+      alert("❌ Current password is incorrect.");
+    } else if (error.response?.status === 400) {
+      alert("⚠️ Current password is required to change your password.");
+    } else {
+      alert("❌ Failed to update password.");
+    }
   }
 };
+
+
+
+
+
+
+
+
 
   // --- Render tabs ---
   const renderTabProfil = () => {

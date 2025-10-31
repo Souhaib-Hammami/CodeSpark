@@ -212,7 +212,7 @@ try
         }
         );
         console.log("last",res.data.data)
-
+      //  setShareData(res.data.data)
 setjoinedGrp(res.data.data)
 
     }
@@ -244,17 +244,6 @@ useEffect(() => {
 
 
 
-  useEffect(() => {
-    if (!token) {
-      console.error("No token found in localStorage");
-      return;
-    }
-
-handleGetFile_4Groups()
-
-handleGetFiles()  
-
-
 const getjoinedGrp = async () => {
   if (!token) {
     console.error("No token found");
@@ -268,11 +257,18 @@ const getjoinedGrp = async () => {
     const res = await axios.get(`http://localhost:3001/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+const ownedGroups = (res.data.join_your_groups || []).map(g => ({
+  group_id: g.group_id,
+  group_name: g.group_name,
+}));
 
-    // Update state with the joined groups
-    // setjoinedGrp(res.data.joined || []);
-    setShareData(res.data.joined || []);
+const joinedGroups = (res.data.joined_from_others_groups || []).map(g => ({
+  group_id: g.group_id,
+  group_name: g.group_name,
+}));
 
+setShareData([...ownedGroups, ...joinedGroups]);
+    console.log("setsharedata : " , shareData )
 
     // Log the data directly from response (not from state, which updates asynchronously)
     // console.log("The joined groups are:", res.data.joined);
@@ -283,15 +279,22 @@ const getjoinedGrp = async () => {
 };
 
 
+
+
+  useEffect(() => {
+    if (!token) {
+      console.error("No token found in localStorage");
+      return;
+    }
+
+handleGetFile_4Groups()
+
+handleGetFiles()  
+
+
+
+
 getjoinedGrp();
-
-
-
-
-
-
-
-
 
 
   }, [token]);
@@ -511,13 +514,18 @@ return (
 
 
     position: 'relative',
-    backgroundImage: 'linear-gradient(to right, #d1a0005b  51%, #ffa201ff  100%)',
-        borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(255, 255, 255, 0.3)', // white shadow
+    // backgroundImage: 'linear-gradient(to right, #d1a0005b  51%, #ffa201ff  100%)',
+    background: 'linear-gradient(45deg, #ff9900, #ff1e00ff)',
+    color: 'white',
+    border: 'none',
+
+
+    borderRadius: '12px',
+    // boxShadow: '0 4px 12px rgba(255, 255, 255, 0.3)', // white shadow
     padding: '16px',
   }}
 >
-  <div className="-EDR-sidebar-title">Your Storage</div>
+  <div className="-EDR-sidebar-title ">Your Storage</div>
   <button
     onClick={handleCreateFile}
     className="-EDR-new-file-btn"
@@ -595,7 +603,9 @@ return (
                                   </div>
                                 </div>
                                 </div>   
-                                  <ContextMenu ref={cm}  global model={items} className="my-context-menu" breakpoint="67px" />                    
+                                  {/* <ContextMenu ref={cm}  global model={items} className="my-context-menu" breakpoint="67px" />   the contextMenu fi el page lKol na7i el global                   */}
+                                  <ContextMenu ref={cm}  model={items} className="my-context-menu" breakpoint="67px" />                    
+
               </div>
 
 
@@ -617,8 +627,7 @@ return (
                       style={{
                 position: 'relative',
 //                backgroundImage: 'linear-gradient(to right, #d1a0005b  51%, #ffa201ff  100%)',
-                backgroundImage: 'linear-gradient(to right, #bab5ae27  51%, #f0e3cd76  100%)',
-
+                 backgroundColor:'white',
                 color: '#f8f8f2',        // text color
                 borderRadius: '12px',
                 padding:'1rem',
@@ -626,7 +635,14 @@ return (
 
                         }}
                       >
-                        <div className='-EDR-sidebar-title'> Your groups</div>
+                      <svg className="-EDR-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      </svg>
+
+                        <div className='-EDR-sidebar-title-Storage'> Your groups</div>
                     </div>
 
 
@@ -643,7 +659,7 @@ renameMe(15).js */}
 {/* fixed  */}
 <div className="groups&theirFiles-tree">
   {joinedGrp.length === 0 ? (
-    <p>You are not in any group...</p>
+    <p style={{color:'white'}}>Create a group or join one !</p>
   ) : (
     (() => {
       // Group files by group name
@@ -673,6 +689,7 @@ renameMe(15).js */}
               className="groups&theirFiles-file"
               onClick={() => {
 
+              setSelectedFilename(fileObj.filename);
 
                 setFile_idFromsql(fileObj.file_id)
                 geFileContent()
@@ -725,7 +742,15 @@ aaaa ggggroupe:
                     <div className="-EDR-toolbar-actions">
                         <button 
                         className="-EDR-toolbar-btn"
-                       onClick={showsharemodel}
+                        // onClick={showsharemodel}
+                   
+                          onClick={() => {
+                            showsharemodel();
+                            getjoinedGrp();
+                          }}
+
+
+
 
                         >
                             <svg className="-EDR-toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

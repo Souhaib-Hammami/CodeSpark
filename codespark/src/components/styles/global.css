@@ -55,6 +55,7 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
 .logo-text {
   font-weight: bold;
   font-size: 1.25rem;
+  color: #ffffff;
 }
 
 
@@ -832,13 +833,17 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
             height: 100vh;
             padding: 1rem;
             border-radius: 16px;
+            background-color: #000;
+            /* background-color: #1e1611; */
             box-shadow: 0 4px 8px rgba(17, 17, 26, 0.1);
         }
 
         /* Top Navigation Bar */
         .-EDR-top-nav {
             height: 56px;
-            background: rgba(255, 255, 255, 0.95);
+/* background-color: #1e1611 */
+background-color: #000
+;
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.08);
             display: flex;
@@ -874,14 +879,14 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
             cursor: pointer;
             font-size: 0.875rem;
             font-weight: 500;
-            color: #67625f;
+            color: #ffffff;
             align-items:center;
             transition: all 0.2s ease;
         }
 
         .-EDR-nav-btn:hover {
             background-color: #f3f4f6;
-            color: #14b8a6;
+            color: #000000;
             transform: translateY(-1px);
         }
 
@@ -915,16 +920,16 @@ background: linear-gradient(to bottom, #eff6ff, #ffffff);
         .-EDR-file-sidebar {
             width: 280px;
             background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
-            border-right: 1px solid rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
             border-radius: 16px 0 0 16px;
         }
 
         .-EDR-sidebar-header {
-background: linear-gradient(270deg, #656d7a , #4c515a 25%, #33373d 50%, #1d1e21 75%, #000000 100%)
-          ;
-            padding: 1.5rem;
+/* background: linear-gradient(270deg, #656d7a , #4c515a 25%, #33373d 50%, #1d1e21 75%, #000000 100%); */
+          
+          background-color: #29221d;
+          padding: 1.5rem;
             border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         }
 
@@ -937,6 +942,26 @@ background: linear-gradient(270deg, #656d7a , #4c515a 25%, #33373d 50%, #1d1e21 
             letter-spacing: 0.05em;
             margin-bottom: 1rem;
         }
+
+
+
+
+        .-EDR-sidebar-title-Storage {
+            
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #ff9900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+
+
+
+
+
+        
 
         /* === Custom Context Menu Styling === */
 
@@ -1062,8 +1087,11 @@ background: linear-gradient(270deg, #656d7a , #4c515a 25%, #33373d 50%, #1d1e21 
         }
 
         .-EDR-file-list {
-          background: linear-gradient(270deg, #656d7a , #4c515a 25%, #33373d 50%, #1d1e21 75%, #000000 100%);
-            flex: 1;
+          /* background: linear-gradient(270deg, #656d7a , #4c515a 25%, #33373d 50%, #1d1e21 75%, #000000 100%); */
+            background-color: #29221d;
+          
+          
+          flex: 1;
             overflow-y: auto;
             padding: 0.3rem;
         }

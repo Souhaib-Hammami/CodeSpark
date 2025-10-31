@@ -1,6 +1,6 @@
 
 const { users } = require("../models");
-// const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 
 const updateUserInfo = async (req, res) => {
   try {
@@ -37,15 +37,31 @@ const updateUserInfo = async (req, res) => {
         .json({ error: "Current password is required to change your password" });
       }
 
-      // Check if the provided current password matches the stored one
-      if (current_password !== user.password_hash) {
-        return res
-        .status(401)
-        .json({ error: "Current password is incorrect" });
-      }
 
-      // Update with new password (plain text)
-      user.password_hash = password_hash;
+  console.log("=== PASSWORD DEBUG ===");
+  console.log("Current password from request:", current_password);
+  console.log("Current password length:", current_password.length);
+  console.log("Stored hash from DB:", user.password_hash);
+  console.log("Stored hash length:", user.password_hash.length);
+  
+  const isSamePassword = await bcrypt.compare(current_password, user.password_hash);
+  console.log("Password match result:", isSamePassword);
+  console.log("===================");
+
+
+
+
+
+    if (!isSamePassword) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+
+
+      // Hash the NEW password before saving
+      const salt = await bcrypt.genSalt(12);
+      user.password_hash = await bcrypt.hash(password_hash, salt);
+
+
     }
 
 
@@ -67,8 +83,7 @@ const updateUserInfo = async (req, res) => {
     .status(200)
     .json({
       success: true,
-      message: "User updated successfully",
-      user,
+      message: "User updated successfully"
     });
   } catch (error) {
     console.error("Error updating user:", error);

@@ -6,7 +6,7 @@ const Share = ({ SelectedFileName, visibility, setVisibility, props }) => {
 
   
   const [selectedGroups, setSelectedGroups] = useState(new Set());
-//console.log(props)
+console.log("in shared component",props)
   const toggleGroup = (group_id) => {
     setSelectedGroups(prev => {
       const newSet = new Set(prev);

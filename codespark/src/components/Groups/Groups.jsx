@@ -90,6 +90,32 @@ const Groups = () => {
       .catch((err) => console.error("Error fetching groups:", err));
   };
 
+const getjoinedGrp = async () => {
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+
+      const res = await axios.get(`http://localhost:3001/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      
+      // Update state with the joined groups
+      setjoinedGrp(res.data.joined_from_others_groups || []);
+
+      // console.log(" joined groups are:", res.data.joined);
+    } catch (err) {
+      console.error("Error fetching joined groups:", err);
+    }
+  };
+
+
+
   const handleClick = async (groupId) => {
     if (!token) return console.error("No token found");
 
@@ -134,28 +160,7 @@ const Groups = () => {
     getjoinedGrp();
   };
 
-  const getjoinedGrp = async () => {
-    if (!token) {
-      console.error("No token found");
-      return;
-    }
-
-    try {
-      const decoded = jwtDecode(token);
-      const userId = decoded.id;
-
-      const res = await axios.get(`http://localhost:3001/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Update state with the joined groups
-      setjoinedGrp(res.data.joined || []);
-
-      // console.log(" joined groups are:", res.data.joined);
-    } catch (err) {
-      console.error("Error fetching joined groups:", err);
-    }
-  };
+  
 
   useEffect(() => {
     fetch();
@@ -495,7 +500,7 @@ const Groups = () => {
                       {/* magaditech el description fel groups-member table */}
 
                       {/* saye gaditha */}
-                      <p className="GrpMutedText">{group.group_description}</p>
+                      <p className="GrpMutedText">{group.description}</p>
                     </div>
                     <div className="GrpDropdown">
                       <img

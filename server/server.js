@@ -98,6 +98,11 @@ const deleteGrp=require('./routes/deleteGrp')
 app.use("/",deleteGrp)
 
 
+const register=require('./routes/register')
+app.use("/",register)
+
+
+
 const TestConection =require('./postgresql/TestConection')
 TestConection()
 

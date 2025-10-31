@@ -1,13 +1,13 @@
 const { users } = require('../models');
 const jwt=require('jsonwebtoken')
-
+const bcrypt = require('bcrypt');
 
 
 
 
 const login = async (req, res) => {
   const username = req.body.username;
-  const password = req.body.password_hash;
+  const password = req.body.password;
   console.log("username : " + username )
   console.log("password : "+ password )
 
@@ -19,7 +19,10 @@ const login = async (req, res) => {
         }
 
 
-        const isSamePassword = password === user.password_hash;
+           const isSamePassword = await bcrypt.compare(password, user.password_hash);
+    if (!isSamePassword) {
+      return res.status(400).json({ message: "Incorrect password" });
+    }
 
         //console.log(isSamePassword)
 
