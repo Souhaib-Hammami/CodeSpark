@@ -2,6 +2,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Routes, Route } from 'react-router-dom'; 
 import LandingPage from './components/LandingPage/LandingPage';
 import Login from '../src/components/Auth/Login';
+import ResetPassword from '../src/components/Auth/ResetPassword';
 import EditorCode from './components/Editor/EditorPage';
 import Profil from './components/Profil/Profil';
 import Groups from './components/Groups/Groups';
@@ -28,6 +29,8 @@ function App() {
   <Route path="/editor" element={<EditorCode/>}/>
   <Route path="/profil" element={<Profil/>}/>
   <Route path="/groups" element={<Groups/>}/>
+  <Route path="/reset-password/:token/" element={<ResetPassword />} />
+
 </Routes>
 
      </BrowserRouter>     

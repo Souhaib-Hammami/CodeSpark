@@ -59,10 +59,18 @@ const register = async(e) => {
     
   } catch (error) {
     console.log(error);
-    alert(error.response?.data?.message || "Registration failed. Please try again.");
+    alert(error.response?.data?.message || "Registration failed. password must be at least 6 caracters");
   }
 }
 
+async function handleForgotPassword(email) {
+  try {
+    const response = await axios.post('http://localhost:3001/forgot-password', { email });
+    alert(response.data.message);
+  } catch (error) {
+    alert('Error sending password reset email');
+  }
+}
 
 
 
@@ -109,10 +117,7 @@ const [visible, setVisible] = useState(false);
     
   };
 
-  const handleSocialLogin = (platform) => {
-    console.log(`Social login with ${platform}`);
-    alert(`Social login with ${platform} (functionality not implemented)`);
-  };
+
 
   const navigate = useNavigate();
   const handleHome = () => navigate('/');
@@ -218,42 +223,7 @@ const [visible, setVisible] = useState(false);
               minHeight: '100%',
             }}
           >
-            {/* Social buttons (left side) */}
-            <div className="socialWrapper">
-              <button
-                style={{ marginBottom: '5px' }}
-                type="button"
-                className="social-btn"
-                onClick={() => handleSocialLogin('Twitter')}
-              >
-                <FontAwesomeIcon icon={faTwitterSquare} size="4x" className="social-icon twitter" />
-              </button>
-              <button
-                style={{ marginBottom: '5px' }}
-                type="button"
-                className="social-btn"
-                onClick={() => handleSocialLogin('Tumblr')}
-              >
-                <FontAwesomeIcon icon={faTumblrSquare} size="4x" className="social-icon tumblr" />
-              </button>
-              <button
-                style={{ marginBottom: '5px' }}
-                type="button"
-                className="social-btn"
-                onClick={() => handleSocialLogin('Google+')}
-              >
-                <FontAwesomeIcon icon={faGooglePlusSquare} size="4x" className="social-icon google" />
-              </button>
-              <button
-                style={{ marginBottom: '5px' }}
-                type="button"
-                className="social-btn"
-                onClick={() => handleSocialLogin('GitHub')}
-              >
-                <FontAwesomeIcon icon={faGithubSquare} size="4x" className="social-icon github" />
-              </button>
-            </div>
-
+           
             {/* ---------- FLIP CARD WRAPPER ---------- */}
             <div
               style={{
@@ -329,7 +299,19 @@ const [visible, setVisible] = useState(false);
                     <button type="submit" className="login-button">Log In</button>
                   </form>
                   <div className="login-footer">
-                    <a href="#">Forgot password?</a> |{' '}
+                    <a href="/"
+                    
+                                    onClick={(e) => {
+                      e.preventDefault();
+                      const email = prompt("Enter your registered email:");
+                      if (email) handleForgotPassword(email);
+                    }}
+                    
+                    
+                    >Forgot password?</a> |{' '}
+
+
+
                     <a href="#" onClick={handleFlip}>Create account</a>
                   </div>
                   <div className="code-line" style={{ marginTop: '20px' }}></div>

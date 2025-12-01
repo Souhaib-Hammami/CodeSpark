@@ -101,7 +101,8 @@ app.use("/",deleteGrp)
 const register=require('./routes/register')
 app.use("/",register)
 
-
+const authRoutes = require('./routes/authRoutes');
+app.use('/', authRoutes);
 
 const TestConection =require('./postgresql/TestConection')
 TestConection()

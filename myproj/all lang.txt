@@ -1,0 +1,87 @@
+abap
+
+apex
+
+azcli
+
+bat (Batch files)
+
+clojure
+
+coffee script
+
+cpp (C/C++)
+
+csharp (C#)
+
+csp
+
+css and its dialects (css, less, scss)
+
+dockerfile
+
+fsharp
+
+go
+
+graphql
+
+handlebars
+
+html
+
+ini
+
+java
+
+javascript
+
+lua
+
+markdown
+
+msdax
+
+mysql
+
+objective‑c
+
+pascal / pascaligo
+
+pgsql (PostgreSQL)
+
+php
+
+powershell
+
+pug
+
+python
+
+r
+
+razor
+
+ruby
+
+rust
+
+scheme
+
+small basic
+
+solidity
+
+sql
+
+st
+
+swift
+
+typescript
+
+vb (Visual Basic)
+
+xml
+
+yaml

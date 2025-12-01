@@ -138,7 +138,10 @@ const NavBar = ({ link_switch }) => {
   return (
     <div className="-EDR-top-nav">
       <div className="-EDR-nav-left">
-        <div className="logo" onClick={Go2Home}>
+        <div 
+        style={{   position: 'relative',zIndex: '9999'}}
+        
+        className="logo" onClick={Go2Home}>
           <img className="logo-icon" src="./logo.png" alt="logo" />
           <span className="logo-text">Code Spark</span>
         </div>

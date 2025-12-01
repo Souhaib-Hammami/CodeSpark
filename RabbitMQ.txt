@@ -1,0 +1,60 @@
+install before  microsoft visual studio c++ 2015-2019
+install next elang (a programming language) 
+install rabbitmq server (windows installer .exe)
+
+ 
+to start 
+
+open a  cmd called "RabbitMQ Command Prompt (sbin dir)" (you can search it )
+
+ in this cmd C:\Program Files\RabbitMQ Server\rabbitmq_server-4.2.0\sbin> 
+type  "rabbitmq-plugins enable rabbitmq_management"
+
+
+
+go to the windows services and search for rabbitmq and click right and restart the shit 
+
+go to http://localhost:15672/    user :guest  pw:guest 
+
+
+
+
+POST http://localhost:3001/forgot-password
+
+
+npm install amqplib nodemailer crypto
+
+
+
+
+async function handleForgotPassword(email) {
+  try {
+    const response = await axios.post('http://localhost:3001/forgot-password', { email });
+    alert(response.data.message);
+  } catch (error) {
+    alert('Error sending password reset email');
+  }
+}
+
+
+
+app.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Current node details:
+ * node name: 'rabbitmqcli-956-rabbit@SOUHAIB'
+ * effective user's home directory: c:/Users/souha
+ * Erlang cookie hash: pA8BdruZHm34QqIronRQrw==

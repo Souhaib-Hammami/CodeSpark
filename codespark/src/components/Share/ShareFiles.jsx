@@ -37,7 +37,7 @@ const handleSubmit = async (e) => {
     const groupIds = selectedGroupsData.map(item => item.group_id);
     const selectedGroupNames = selectedGroupsData.map(item => item.group_name);
 
-    await axios.post(
+     const res =await axios.post(
       "http://localhost:3001/shareFiles",
       {
         userId,
@@ -47,15 +47,18 @@ const handleSubmit = async (e) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
+
     console.log("Sharing with groups:", selectedGroupNames);
     alert(`File shared successfully with:\n${selectedGroupNames.join('\n')}`);
 
     setSelectedGroups(new Set());
     setVisibility(false);
 
+ 
+
   } catch (error) {
     console.error("Error sharing file:", error);
-    alert("Error sharing file!");
+    alert("Error sharing file maybe File name already exist in the group");
   }
 };
 

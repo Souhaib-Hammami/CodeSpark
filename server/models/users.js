@@ -1,40 +1,47 @@
-const users=(connection,DataTypes)=>{
+const users = (connection, DataTypes) => {
+  const Users = connection.define("users", {
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
 
- const Users=connection.define(
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
+      },
+    },
 
-    "users", 
+    password_hash: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
 
-        {
-        username:{
-            type:DataTypes.STRING,
-            allowNull : false,
-            unique: true
-        },
+    bio: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
 
+    //  Added for password reset feature
+    resetToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
 
-        email:{
-            type:DataTypes.STRING,
-            allowNull:false,
-            unique: true
-        },
+    tokenExpiry: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "users",
+    timestamps: true,
+  });
 
+  return Users;
+};
 
-        password_hash :{
-        type:DataTypes.STRING,
-        allowNull : false
-
-        },
-
-
-        bio:{
-            type:DataTypes.STRING,
-            allowNull:true,
-            unique: false
-        }
-
-    })
-
-        return Users   
-    }
-module.exports=users
-
+module.exports = users;
